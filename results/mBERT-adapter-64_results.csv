@@ -1,0 +1,6 @@
+model,split,auc_roc,f1,accuracy,precision,recall
+mBERT-adapter-64,English Test (20%),0.9732,0.6846,0.92,0.5494,0.9081
+mBERT-adapter-64,Multilingual Val,0.8261,0.3394,0.8506,0.5302,0.2496
+mBERT-adapter-64,Val-es,0.8224,0.4209,0.836,0.521,0.3531
+mBERT-adapter-64,Val-it,0.7719,0.3232,0.804,0.4958,0.2398
+mBERT-adapter-64,Val-tr,0.89,0.2175,0.9017,0.7193,0.1281

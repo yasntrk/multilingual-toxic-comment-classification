@@ -225,6 +225,10 @@ def train(args):
         num_training_steps=total_steps)
 
     print("\nTraining ...")
+    # mBERT converges within a couple of epochs; cross-lingual val AUC tends to
+    # peak early and then drift down as the model overfits to English. Keep the
+    # checkpoint with the best multilingual val AUC instead of the last one.
+    best_auc, best_state, best_epoch = -1.0, None, 0
     for epoch in range(1, args.epochs + 1):
         model.train()
         t0, running = time.time(), 0.0
@@ -253,6 +257,16 @@ def train(args):
         val_metrics = metrics_utils.compute_metrics(splits["y_val"], val_prob)
         print(f"  Epoch {epoch} done: val_AUC={val_metrics['auc_roc']:.4f} "
               f"({time.time() - t0:.0f}s)")
+
+        if val_metrics["auc_roc"] > best_auc:
+            best_auc, best_epoch = val_metrics["auc_roc"], epoch
+            best_state = {k: v.detach().cpu().clone()
+                          for k, v in model.state_dict().items()}
+
+    if best_state is not None:
+        model.load_state_dict(best_state)
+        print(f"Restored best checkpoint from epoch {best_epoch} "
+              f"(val_AUC={best_auc:.4f}).")
 
     return model, tokenizer, splits, device, (trainable, total)
 
