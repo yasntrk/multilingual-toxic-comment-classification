@@ -1,0 +1,50 @@
+{
+  "threshold": 0.25,
+  "results": [
+    {
+      "model": "BiLSTM",
+      "split": "English Test (20%)",
+      "auc_roc": 0.9362,
+      "f1": 0.3587,
+      "accuracy": 0.672,
+      "precision": 0.2206,
+      "recall": 0.9586
+    },
+    {
+      "model": "BiLSTM",
+      "split": "Multilingual Val",
+      "auc_roc": 0.6005,
+      "f1": 0.2928,
+      "accuracy": 0.7023,
+      "precision": 0.2306,
+      "recall": 0.4008
+    },
+    {
+      "model": "BiLSTM",
+      "split": "Val-es",
+      "auc_roc": 0.6255,
+      "f1": 0.3259,
+      "accuracy": 0.54,
+      "precision": 0.2165,
+      "recall": 0.6588
+    },
+    {
+      "model": "BiLSTM",
+      "split": "Val-it",
+      "auc_roc": 0.5695,
+      "f1": 0.3006,
+      "accuracy": 0.6892,
+      "precision": 0.2681,
+      "recall": 0.3422
+    },
+    {
+      "model": "BiLSTM",
+      "split": "Val-tr",
+      "auc_roc": 0.5596,
+      "f1": 0.1742,
+      "accuracy": 0.8483,
+      "precision": 0.2078,
+      "recall": 0.15
+    }
+  ]
+}

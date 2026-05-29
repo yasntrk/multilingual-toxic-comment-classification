@@ -20,6 +20,7 @@ Example:
 
 import os
 import re
+import copy
 import json
 import time
 import argparse
@@ -202,15 +203,26 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     print("\nTraining ...")
+    # Keep the checkpoint with the best multilingual val AUC. The BiLSTM has an
+    # English-only vocabulary, so it overfits to English and its cross-lingual
+    # AUC peaks early then degrades - we must not report the final (worst) epoch.
+    best_auc, best_state, best_epoch = -1.0, None, 0
     for epoch in range(1, args.epochs + 1):
         t0 = time.time()
         loss = run_epoch(model, train_loader, criterion, optimizer, device, train=True)
-        # Track cross-lingual AUC each epoch as a sanity signal.
         val_prob = predict_proba(model, splits["X_val"], vocab, args.max_len, device)
         val_metrics = metrics_utils.compute_metrics(splits["y_val"], val_prob)
         print(f"  Epoch {epoch}/{args.epochs}  "
               f"loss={loss:.4f}  val_AUC={val_metrics['auc_roc']:.4f}  "
               f"({time.time()-t0:.0f}s)")
+        if val_metrics["auc_roc"] > best_auc:
+            best_auc, best_epoch = val_metrics["auc_roc"], epoch
+            best_state = copy.deepcopy(model.state_dict())
+
+    if best_state is not None:
+        model.load_state_dict(best_state)
+        print(f"Restored best checkpoint from epoch {best_epoch} "
+              f"(val_AUC={best_auc:.4f}).")
 
     # Tune the decision threshold on the multilingual validation set.
     val_prob = predict_proba(model, splits["X_val"], vocab, args.max_len, device)
