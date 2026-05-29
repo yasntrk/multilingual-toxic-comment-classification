@@ -80,7 +80,6 @@ def load_pred_files(split_tag):
 
 def model_threshold(model_name):
     """Look up a tuned threshold from a model's summary JSON, else 0.5."""
-    safe = model_name.replace(" ", "*")
     for path in glob.glob(os.path.join(RESULTS_DIR, "*_results.json")):
         try:
             with open(path) as f:

@@ -27,16 +27,27 @@ multilingual-toxic-comment-classification/
   requirements.txt
   .gitignore
   src/
-    preprocess.py          # Data loading and text cleaning
+    data_utils.py          # Shared loading, cleaning, train/test split
+    metrics_utils.py       # Shared metrics + threshold tuning + per-language eval
+    preprocess.py          # Optional: write cleaned splits to disk
     eda.py                 # Exploratory data analysis and plots
     train_baselines.py     # TF-IDF + LR/NB/SVM baselines
-    train_transformer.py   # mBERT and mBERT+adapter training
-    evaluate.py            # Metrics computation and visualization
+    train_lstm.py          # BiLSTM baseline (PyTorch)
+    train_transformer.py   # mBERT full fine-tuning and mBERT + adapters
+    evaluate.py            # Comparison tables and all visualizations
   data/                    # Raw and processed data (gitignored)
-  results/                 # Experiment results (CSV/JSON)
+  results/                 # Experiment results (CSV/JSON, predictions)
   figures/                 # Generated plots
   models/                  # Saved model checkpoints (gitignored)
 ```
+
+### Text cleaning
+
+`data_utils` provides two cleaners, used deliberately:
+
+- `aggressive_clean` (ASCII only) — used by the TF-IDF baselines. Strong on
+  English, collapses on other languages, which quantifies the cross-lingual gap.
+- `light_clean` (Unicode-preserving) — used by the LSTM and mBERT models.
 
 ## Setup
 
@@ -52,21 +63,41 @@ pip install -r requirements.txt
 # 1. Exploratory data analysis
 python src/eda.py
 
-# 2. Preprocess data
-python src/preprocess.py
-
-# 3. Train TF-IDF baselines
+# 2. Train TF-IDF baselines (LR / NB / SVM)
 python src/train_baselines.py
 
-# 4. Train mBERT (full fine-tuning)
-python src/train_transformer.py --model mbert --epochs 3
+# 3. Train the BiLSTM baseline
+python src/train_lstm.py --max-train-samples 40000 --epochs 4 --device mps
 
-# 5. Train mBERT with adapters
-python src/train_transformer.py --model mbert-adapter --epochs 3 --adapter-size 128
+# 4. Train mBERT with adapters (parameter-efficient, the proposed method)
+python src/train_transformer.py --mode adapter --adapter-size 64 \
+    --max-train-samples 30000 --epochs 2 --device mps --save-model
 
-# 6. View results summary
+# 5. Train mBERT with full fine-tuning (the strong baseline)
+python src/train_transformer.py --mode full \
+    --max-train-samples 20000 --epochs 1 --device mps
+
+# 6. Build comparison tables and all figures
 python src/evaluate.py
+
+# 7. (optional) t-SNE of mBERT embeddings — needs a model saved in step 4
+python src/evaluate.py --task tsne --model-dir models/mBERT-adapter-64
 ```
+
+### Running on a laptop (Apple Silicon / CPU)
+
+The full English training set has ~223K rows, so for a few-hour budget on a
+MacBook use `--device mps` and `--max-train-samples` to subsample. Adapter mode
+trains <2% of mBERT's parameters and is the fastest transformer option. The
+English test split is always evaluated on the full holdout regardless of
+subsampling, so results stay comparable.
+
+### Ablation knobs
+
+- `--adapter-size {64,128,256}` — adapter bottleneck capacity.
+- `--max-len {64,128,256}` — sequence length vs. speed trade-off.
+- `--no-clean` — feed raw text to mBERT (cleaning ablation).
+- `--mode {full,adapter}` — full fine-tuning vs. parameter-efficient adapters.
 
 ## Baseline Results (English Test Split)
 
