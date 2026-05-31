@@ -35,10 +35,12 @@ multilingual-toxic-comment-classification/
     train_lstm.py          # BiLSTM baseline (PyTorch)
     train_transformer.py   # mBERT full fine-tuning and mBERT + adapters
     evaluate.py            # Comparison tables and all visualizations
+    predict_app.py         # Interactive demo: type a comment -> toxic / not toxic
   data/                    # Raw and processed data (gitignored)
   results/                 # Experiment results (CSV/JSON, predictions)
   figures/                 # Generated plots
   models/                  # Saved model checkpoints (gitignored)
+  presentation/            # Term-project slide deck (build script + .pptx)
 ```
 
 ### Text cleaning
@@ -82,6 +84,12 @@ python src/evaluate.py
 
 # 7. (optional) t-SNE of mBERT embeddings — needs a model saved in step 4
 python src/evaluate.py --task tsne --model-dir models/mBERT-adapter-64
+
+# 8. Interactive demo — type a comment, get toxic / not toxic
+#    Needs a model saved in step 4. Opens a browser UI if `gradio` is
+#    installed, otherwise falls back to a terminal prompt.
+python src/predict_app.py                  # web UI (or terminal if no gradio)
+python src/predict_app.py --cli            # force terminal prompt
 ```
 
 ### Running on a laptop (Apple Silicon / CPU)

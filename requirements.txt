@@ -5,3 +5,8 @@ matplotlib>=3.7
 seaborn>=0.12
 torch>=2.0
 transformers>=4.30
+safetensors>=0.4
+
+# Optional: browser UI for the interactive demo (src/predict_app.py).
+# Without it the demo still runs as a terminal prompt.
+# gradio>=4.0

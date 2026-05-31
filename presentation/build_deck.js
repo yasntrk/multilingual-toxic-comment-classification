@@ -278,34 +278,38 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 7 — PROPOSED METHOD: ADAPTERS
 // =====================================================================
 {
-  const s = contentSlide(6, "Proposed Method: Adapter Tuning", "Parameter-efficient");
-  s.addText("Instead of updating all ~178M weights of mBERT, we freeze the encoder and insert tiny trainable bottleneck modules.", {
-    x: 1.45, y: 1.65, w: 11.2, h: 0.6, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
-  });
+  const s = contentSlide(6, "Proposed Method: Adapter Tuning", "The simple idea");
+  s.addText([
+    { text: "Think of mBERT as a huge brain already trained on 104 languages — about ", options: {} },
+    { text: "178 million tiny “knobs.”", options: { bold: true, color: NAVY } },
+  ], { x: 1.45, y: 1.65, w: 11.2, h: 0.5, fontFace: BFONT, fontSize: 17, italic: true, color: TEALD });
 
   s.addText(bullets([
-    "A Houlsby adapter = down-projection → GELU → up-projection, with a residual skip.",
-    "Two adapters added per transformer layer; near-zero init so training starts from the pretrained model.",
-    "Frozen: all mBERT weights.  Trainable: adapters + LayerNorm + classifier head.",
-    "Result: only ~1.34% of parameters are trained — far cheaper to store and adapt.",
-  ], { fontSize: 15 }), { x: 1.45, y: 2.4, w: 6.6, h: 3.2 });
+    "The usual way (full fine-tuning) re-tunes ALL 178M knobs for our task — slow, and you end up storing a whole new copy of the model.",
+    "Adapters: we FREEZE the big brain and snap in a few small new layers inside it.",
+    "We then train ONLY those small layers — about 1 knob in every 75 (1.34%).",
+    "The pretrained knowledge stays intact; the adapters just nudge it toward toxicity detection.",
+  ], { fontSize: 15.5 }), { x: 1.45, y: 2.35, w: 6.65, h: 3.4 });
 
-  // diagram of adapter on the right
-  const dx = 8.5, dw = 4.2;
-  card(s, dx, 2.35, dw, 4.05, WHITE);
-  const box = (label, yy, c, hh) => {
-    s.addShape(pptx.ShapeType.roundRect, { x: dx + 0.7, y: yy, w: dw - 1.4, h: hh || 0.5, rectRadius: 0.05, fill: { color: c }, line: { type: "none" } });
-    s.addText(label, { x: dx + 0.7, y: yy, w: dw - 1.4, h: hh || 0.5, align: "center", valign: "middle", fontFace: BFONT, fontSize: 12.5, bold: true, color: WHITE });
-  };
-  s.addText("Adapter block", { x: dx, y: 2.5, w: dw, h: 0.35, align: "center", fontFace: HFONT, fontSize: 15, bold: true, color: NAVY });
-  box("Up-projection ↑", 2.95, NAVY);
-  box("GELU", 3.6, TEALD, 0.45);
-  box("Down-projection ↓", 4.2, NAVY);
-  box("Transformer hidden state", 5.05, "94A3B8", 0.5);
-  // residual arrow note
-  s.addText("+ residual skip connection", { x: dx, y: 5.7, w: dw, h: 0.35, align: "center", fontFace: BFONT, fontSize: 12, italic: true, color: TEAL });
-  // arrows
-  [3.45, 4.1, 4.7].forEach((yy) => s.addText("↑", { x: dx, y: yy, w: dw, h: 0.18, align: "center", fontSize: 12, color: MUTE }));
+  // simple "what trains vs what is frozen" diagram on the right
+  const dx = 8.45, dw = 4.3;
+  card(s, dx, 2.2, dw, 4.2, WHITE);
+  s.addText("What actually trains?", { x: dx, y: 2.35, w: dw, h: 0.4, align: "center", fontFace: HFONT, fontSize: 15, bold: true, color: NAVY });
+
+  // big frozen mBERT box
+  s.addShape(pptx.ShapeType.roundRect, { x: dx + 0.45, y: 2.9, w: dw - 0.9, h: 2.2, rectRadius: 0.06, fill: { color: "E8EDF5" }, line: { color: "B9C4D6", width: 1 } });
+  s.addText("mBERT encoder · 178M weights\n❄ FROZEN (98.66%)", { x: dx + 0.45, y: 2.98, w: dw - 0.9, h: 0.7, align: "center", fontFace: BFONT, fontSize: 12.5, bold: true, color: "55617A" });
+  // adapter chips inside
+  const chipY = 3.7, chipW = (dw - 1.4) / 3, chipGap = 0.1;
+  for (let i = 0; i < 3; i++) {
+    const cxp = dx + 0.6 + i * (chipW + chipGap);
+    s.addShape(pptx.ShapeType.roundRect, { x: cxp, y: chipY, w: chipW, h: 1.2, rectRadius: 0.05, fill: { color: TEAL }, line: { type: "none" } });
+    s.addText("adapter", { x: cxp, y: chipY, w: chipW, h: 1.2, align: "center", valign: "middle", fontFace: BFONT, fontSize: 11, bold: true, color: WHITE });
+  }
+  // classifier head
+  s.addShape(pptx.ShapeType.roundRect, { x: dx + 0.45, y: 5.25, w: dw - 0.9, h: 0.5, rectRadius: 0.05, fill: { color: TEALD }, line: { type: "none" } });
+  s.addText("classifier head (trained)", { x: dx + 0.45, y: 5.25, w: dw - 0.9, h: 0.5, align: "center", valign: "middle", fontFace: BFONT, fontSize: 12, bold: true, color: WHITE });
+  s.addText("green = trained (1.34%)   ·   grey = frozen", { x: dx, y: 5.9, w: dw, h: 0.35, align: "center", fontFace: BFONT, fontSize: 11, italic: true, color: MUTE });
 }
 
 // =====================================================================
@@ -315,8 +319,8 @@ function card(s, x, y, w, h, fill) {
   const s = contentSlide(7, "Experimental Design", "Implementation details");
   const blocks = [
     ["Splits", ["80/20 English split for in-language test", "Full multilingual validation for transfer", "Validation order preserved for error analysis"]],
-    ["Imbalance", ["pos_weight in BCEWithLogitsLoss (~9.5×)", "Decision threshold tuned on val F1", "Adapter threshold = 0.05"]],
-    ["Early stopping", ["Keep checkpoint with best multilingual-val AUC", "Word models overfit English — peak early", "Avoids reporting a degraded final epoch"]],
+    ["Imbalance", ["Toxic is rare — weight it ~9.5× in the loss", "Tune the decision cut-off, not just 0.5", "so we don't just predict 'clean' for everything"]],
+    ["Early stopping", ["Keep the epoch with best multilingual score", "Word models overfit English and peak early", "avoids reporting a worse, later epoch"]],
     ["Metrics", ["AUC-ROC, F1, accuracy, precision, recall", "Per-language breakdown (tr / es / it)", "Trainable params + ms / sample"]],
     ["Cleaning", ["Aggressive ASCII clean → TF-IDF", "Unicode-preserving clean → LSTM / mBERT", "by design, to expose the gap"]],
     ["Hardware", ["MacBook Air, Apple Silicon (MPS)", "Subsampled training for a few-hour budget", "PyTorch + HuggingFace + scikit-learn"]],
@@ -375,11 +379,13 @@ function card(s, x, y, w, h, fill) {
   s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.44, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
 
   s.addText([
-    { text: "Takeaway:  ", options: { bold: true, color: TEALD } },
-    { text: "TF-IDF & LSTM collapse on unseen languages (~0.6 AUC). mBERT + adapters jumps to ", options: {} },
+    { text: "What to read here:  ", options: { bold: true, color: TEALD } },
+    { text: "every model is strong on English (~0.94–0.97). But on ", options: {} },
+    { text: "unseen languages", options: { bold: true } },
+    { text: " TF-IDF & LSTM collapse to ~0.6 (little better than guessing), while mBERT + adapters holds ", options: {} },
     { text: "0.83", options: { bold: true, color: TEAL } },
-    { text: " — a large transfer gain at ~1% of the cost.", options: {} },
-  ], { x: 1.45, y: 5.0, w: 6.7, h: 1.3, fontFace: BFONT, fontSize: 15, color: INK, lineSpacingMultiple: 1.15, valign: "top" });
+    { text: " — proving cross-lingual transfer, at ~1% of the training cost.", options: {} },
+  ], { x: 1.45, y: 4.95, w: 6.7, h: 1.5, fontFace: BFONT, fontSize: 14.5, color: INK, lineSpacingMultiple: 1.12, valign: "top" });
 
   // native bar chart: multilingual AUC
   const chartData = [{
@@ -401,10 +407,76 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
+// SLIDE 9b — KEY FINDINGS (TURKISH VERSION)
+// =====================================================================
+{
+  const s = contentSlide(9, "Temel Bulgular", "Sonuçlar (Türkçe)");
+  // sonuç tablosu
+  const rows = [
+    [
+      { text: "Model", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left" } },
+      { text: "İngilizce AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Çok dilli AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Eğitilen parametre", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+    ],
+  ];
+  const data = [
+    ["TF-IDF + Lojistik Reg.", "0.969", "0.627", "—"],
+    ["TF-IDF + Naive Bayes", "0.943", "0.605", "—"],
+    ["TF-IDF + SVM", "0.965", "0.582", "—"],
+    ["BiLSTM", "0.936", "0.601", "~7M"],
+    ["mBERT (tam eğitim)", "0.961", "0.848", "%100"],
+    ["mBERT + Adapter (bizim)", "0.973", "0.826", "%1.34"],
+  ];
+  data.forEach((d, ri) => {
+    const isStar = ri === data.length - 1;
+    const bg = isStar ? "E6F7F4" : (ri % 2 ? "EEF3FA" : WHITE);
+    rows.push(d.map((c, ci) => ({
+      text: c,
+      options: {
+        align: ci === 0 ? "left" : "center",
+        bold: isStar,
+        color: isStar ? TEALD : INK,
+        fill: { color: bg },
+        fontSize: 14,
+      },
+    })));
+  });
+  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.52, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+
+  s.addText([
+    { text: "Buradan ne anlamalı:  ", options: { bold: true, color: TEALD } },
+    { text: "her model İngilizcede güçlü (~0.94–0.97). Ama ", options: {} },
+    { text: "hiç görmediği dillerde", options: { bold: true } },
+    { text: " TF-IDF ve LSTM ~0.6’ya düşüyor (neredeyse rastgele), mBERT + adapter ise ", options: {} },
+    { text: "0.83", options: { bold: true, color: TEAL } },
+    { text: "’te kalıyor — diller arası transferi, eğitim maliyetinin ~%1’iyle kanıtlıyor.", options: {} },
+  ], { x: 1.45, y: 4.95, w: 6.7, h: 1.5, fontFace: BFONT, fontSize: 14.5, color: INK, lineSpacingMultiple: 1.12, valign: "top" });
+
+  // çok dilli AUC grafiği
+  const chartData = [{
+    name: "Çok dilli AUC",
+    labels: ["LojReg", "Naive Bayes", "SVM", "BiLSTM", "mBERT tam", "mBERT+Adapter"],
+    values: [0.627, 0.605, 0.582, 0.601, 0.848, 0.826],
+  }];
+  s.addChart(pptx.ChartType.bar, chartData, {
+    x: 8.4, y: 1.85, w: 4.4, h: 4.7,
+    barDir: "col",
+    chartColors: [NAVY, NAVY, NAVY, NAVY, TEALD, TEAL],
+    chartColorsOpacity: [70, 70, 70, 70, 100, 100],
+    showValue: true, dataLabelColor: INK, dataLabelFontSize: 10, dataLabelFormatCode: "0.00",
+    valAxisMinVal: 0.5, valAxisMaxVal: 0.9, valAxisMajorUnit: 0.1,
+    catAxisLabelColor: INK, catAxisLabelFontSize: 9,
+    valAxisLabelColor: MUTE, valAxisLabelFontSize: 9,
+    showLegend: false, showTitle: true, title: "Modele göre çok dilli AUC", titleColor: NAVY, titleFontSize: 13, titleFontFace: HFONT,
+  });
+}
+
+// =====================================================================
 // SLIDE 10 — PER-LANGUAGE PERFORMANCE
 // =====================================================================
 {
-  const s = contentSlide(9, "Per-Language Transfer", "Where it works");
+  const s = contentSlide(10, "Per-Language Transfer", "Where it works");
   // grouped bar: per language AUC for adapter vs a baseline (LogReg)
   const chartData = [
     { name: "TF-IDF LogReg", labels: ["Turkish", "Spanish", "Italian"], values: [0.652, 0.614, 0.600] },
@@ -434,38 +506,49 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 11 — EFFICIENCY: ADAPTER vs FULL
 // =====================================================================
 {
-  const s = contentSlide(10, "Efficiency: Adapters vs Full Fine-Tuning", "The punchline");
-  s.addText("Adapters match full fine-tuning's transfer while training a tiny fraction of the model.", {
-    x: 1.45, y: 1.65, w: 11.2, h: 0.5, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
+  const s = contentSlide(11, "Models 3 vs 4: Full vs Adapter", "What is different?");
+  s.addText("Both start from the very same pre-trained mBERT. The only difference is how much of it we train.", {
+    x: 1.45, y: 1.62, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
   });
 
-  const stats = [
-    ["1.34%", "of parameters trained", TEAL, "vs 100% for full fine-tuning"],
-    ["2.4M", "trainable weights", NAVY, "vs ~178M total in mBERT"],
-    ["~0.83", "multilingual AUC", TEALD, "on par with full fine-tuning (~0.85)"],
-    ["16.9 ms", "per sample (MPS)", NAVY, "practical on a laptop"],
-  ];
-  const cw = 2.78, gap = 0.18; let x = 1.45;
-  stats.forEach(([big, lab, c, sub]) => {
-    card(s, x, 2.5, cw, 2.7, WHITE);
-    s.addShape(pptx.ShapeType.rect, { x, y: 2.5, w: cw, h: 0.12, fill: { color: c } });
-    s.addText(big, { x, y: 2.85, w: cw, h: 0.9, align: "center", fontFace: HFONT, fontSize: 40, bold: true, color: c });
-    s.addText(lab, { x: x + 0.15, y: 3.8, w: cw - 0.3, h: 0.5, align: "center", fontFace: BFONT, fontSize: 14, bold: true, color: NAVY });
-    s.addText(sub, { x: x + 0.2, y: 4.3, w: cw - 0.4, h: 0.8, align: "center", fontFace: BFONT, fontSize: 12, color: MUTE });
-    x += cw + gap;
-  });
+  // two comparison columns
+  const rowsLabels = ["What gets trained", "Trainable params", "Stored per task", "Multilingual AUC", "Cost / speed"];
+  const full = ["ALL of mBERT's weights", "100%  (~178M)", "a full ~700 MB copy", "~0.85  (slightly higher)", "heaviest — updates the whole network"];
+  const adp  = ["only small adapters + head", "1.34%  (~2.4M)", "just a ~2 MB adapter", "~0.83  (on par)", "light — 16.9 ms per comment"];
+
+  const colW = 5.5, colX1 = 1.45, colX2 = 1.45 + colW + 0.4, top = 2.25, headH = 0.7, rowH = 0.72;
+  // headers
+  s.addShape(pptx.ShapeType.roundRect, { x: colX1, y: top, w: colW, h: headH, rectRadius: 0.06, fill: { color: NAVY }, line: { type: "none" } });
+  s.addText("Model 3 · Full Fine-Tuning", { x: colX1, y: top, w: colW, h: headH, align: "center", valign: "middle", fontFace: HFONT, fontSize: 17, bold: true, color: WHITE });
+  s.addShape(pptx.ShapeType.roundRect, { x: colX2, y: top, w: colW, h: headH, rectRadius: 0.06, fill: { color: TEAL }, line: { type: "none" } });
+  s.addText("Model 4 · Adapter Tuning  (ours)", { x: colX2, y: top, w: colW, h: headH, align: "center", valign: "middle", fontFace: HFONT, fontSize: 17, bold: true, color: WHITE });
+
+  // rows
+  let y = top + headH + 0.12;
+  for (let i = 0; i < rowsLabels.length; i++) {
+    const bg = i % 2 ? "EEF3FA" : WHITE;
+    // left
+    s.addShape(pptx.ShapeType.rect, { x: colX1, y, w: colW, h: rowH, fill: { color: bg }, line: { color: "E2E8F0", width: 0.5 } });
+    s.addText(rowsLabels[i], { x: colX1 + 0.2, y, w: 2.1, h: rowH, valign: "middle", fontFace: BFONT, fontSize: 11.5, bold: true, color: MUTE });
+    s.addText(full[i], { x: colX1 + 2.25, y, w: colW - 2.4, h: rowH, valign: "middle", fontFace: BFONT, fontSize: 13.5, color: INK });
+    // right
+    s.addShape(pptx.ShapeType.rect, { x: colX2, y, w: colW, h: rowH, fill: { color: i % 2 ? "E6F7F4" : "F2FBF9" }, line: { color: "CDEDE6", width: 0.5 } });
+    s.addText(rowsLabels[i], { x: colX2 + 0.2, y, w: 2.1, h: rowH, valign: "middle", fontFace: BFONT, fontSize: 11.5, bold: true, color: TEALD });
+    s.addText(adp[i], { x: colX2 + 2.25, y, w: colW - 2.4, h: rowH, valign: "middle", fontFace: BFONT, fontSize: 13.5, bold: true, color: INK });
+    y += rowH;
+  }
 
   s.addText([
-    { text: "Why it matters:  ", options: { bold: true, color: TEALD } },
-    { text: "one frozen mBERT can be specialised per task by swapping a 2 MB adapter — cheaper to store, train and deploy than a full copy.", options: {} },
-  ], { x: 1.45, y: 5.6, w: 11.3, h: 0.8, fontFace: BFONT, fontSize: 15, color: INK });
+    { text: "In short:  ", options: { bold: true, color: TEALD } },
+    { text: "the adapter reaches almost the same accuracy as full fine-tuning while training ~75× fewer weights — far cheaper to train, store and swap.", options: {} },
+  ], { x: 1.45, y: y + 0.15, w: 11.3, h: 0.7, fontFace: BFONT, fontSize: 14.5, color: INK });
 }
 
 // =====================================================================
 // SLIDE 12 — ERROR ANALYSIS
 // =====================================================================
 {
-  const s = contentSlide(11, "Error Analysis", "Right & wrong");
+  const s = contentSlide(12, "Error Analysis", "Right & wrong");
   s.addText("Real mBERT-adapter predictions on the multilingual validation set (threshold 0.05).", {
     x: 1.45, y: 1.65, w: 11.2, h: 0.4, fontFace: BFONT, fontSize: 14, italic: true, color: TEALD,
   });
@@ -495,10 +578,45 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
+// SLIDE 12b — RELATED WORK / COMPARISON
+// =====================================================================
+{
+  const s = contentSlide(13, "How We Compare to Other Work", "Related work");
+  s.addText("We are not the first to tackle multilingual toxicity. Here is how our laptop-scale result sits next to the literature.", {
+    x: 1.45, y: 1.62, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 15.5, italic: true, color: TEALD,
+  });
+
+  const head = ["Study / system", "Method", "Multilingual AUC", "Setup"];
+  const rowsData = [
+    ["Jigsaw Kaggle winners (2020)", "XLM-R (large) + ensembles", "~0.95", "full test set · heavy GPUs"],
+    ["Published mBERT cross-lingual", "full fine-tuning", "~0.80–0.85", "similar idea to ours"],
+    ["Houlsby et al. (2019), adapters", "adapters on BERT", "≈ full  (−0.4%)", "shows adapters ≈ full tuning"],
+    ["Ours: mBERT + adapter", "adapters, English-only train", "0.83", "laptop · 1.34% params"],
+  ];
+  const table = [head.map((h) => ({ text: h, options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left", fontSize: 13 } }))];
+  rowsData.forEach((d, ri) => {
+    const isStar = ri === rowsData.length - 1;
+    const bg = isStar ? "E6F7F4" : (ri % 2 ? "EEF3FA" : WHITE);
+    table.push(d.map((c) => ({ text: c, options: { align: "left", bold: isStar, color: isStar ? TEALD : INK, fill: { color: bg }, fontSize: 12.5 } })));
+  });
+  s.addTable(table, { x: 1.45, y: 2.2, w: 11.3, colW: [3.5, 3.0, 2.2, 2.6], rowH: 0.5, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+
+  s.addText(bullets([
+    "The best public scores (~0.95) use far bigger models (XLM-R), many languages and ensembles — well beyond a laptop budget.",
+    "Our 0.83 lands in the same range as published mBERT cross-lingual results, even though we trained on English only.",
+    "Adapter studies (Houlsby 2019; Pfeiffer MAD-X 2020) report adapters matching full fine-tuning — exactly the pattern we see (0.83 vs 0.85).",
+  ], { fontSize: 13.5 }), { x: 1.45, y: 5.0, w: 11.3, h: 1.6 });
+
+  s.addText("Different test sets, model sizes and compute — shown for context, not a head-to-head ranking.", {
+    x: 1.45, y: 6.6, w: 11.3, h: 0.35, fontFace: BFONT, fontSize: 11, italic: true, color: MUTE,
+  });
+}
+
+// =====================================================================
 // SLIDE 13 — CONCLUSIONS
 // =====================================================================
 {
-  const s = contentSlide(12, "Concluding Remarks", "What we learned");
+  const s = contentSlide(14, "Concluding Remarks", "What we learned");
   const points = [
     ["Cross-lingual transfer is real", "A multilingual encoder generalises toxicity from English to unseen languages; word-count and LSTM models cannot."],
     ["Adapters are the sweet spot", "~1.34% of parameters reach full-fine-tuning-level transfer (~0.83 AUC) — the project's main result."],
