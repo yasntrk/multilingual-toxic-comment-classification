@@ -1,0 +1,246 @@
+{
+  "most_toxic": [
+    {
+      "feature": "fuck",
+      "weight": 15.893
+    },
+    {
+      "feature": "stupid",
+      "weight": 14.6143
+    },
+    {
+      "feature": "fucking",
+      "weight": 14.1497
+    },
+    {
+      "feature": "shit",
+      "weight": 13.5491
+    },
+    {
+      "feature": "idiot",
+      "weight": 12.7018
+    },
+    {
+      "feature": "asshole",
+      "weight": 10.2913
+    },
+    {
+      "feature": "bitch",
+      "weight": 9.9797
+    },
+    {
+      "feature": "bullshit",
+      "weight": 9.3192
+    },
+    {
+      "feature": "ass",
+      "weight": 9.2079
+    },
+    {
+      "feature": "penis",
+      "weight": 9.2047
+    },
+    {
+      "feature": "suck",
+      "weight": 9.1218
+    },
+    {
+      "feature": "idiots",
+      "weight": 9.0696
+    },
+    {
+      "feature": "dick",
+      "weight": 8.5365
+    },
+    {
+      "feature": "faggot",
+      "weight": 7.8474
+    },
+    {
+      "feature": "crap",
+      "weight": 7.7517
+    },
+    {
+      "feature": "moron",
+      "weight": 7.7507
+    },
+    {
+      "feature": "you",
+      "weight": 7.1894
+    },
+    {
+      "feature": "nigger",
+      "weight": 7.0257
+    },
+    {
+      "feature": "gay",
+      "weight": 6.8986
+    },
+    {
+      "feature": "cunt",
+      "weight": 6.8954
+    },
+    {
+      "feature": "sucks",
+      "weight": 6.8078
+    },
+    {
+      "feature": "fucked",
+      "weight": 6.6956
+    },
+    {
+      "feature": "bastard",
+      "weight": 6.5127
+    },
+    {
+      "feature": "stupidity",
+      "weight": 6.2805
+    },
+    {
+      "feature": "dumbass",
+      "weight": 6.2112
+    },
+    {
+      "feature": "jerk",
+      "weight": 6.196
+    },
+    {
+      "feature": "idiotic",
+      "weight": 5.853
+    },
+    {
+      "feature": "kill",
+      "weight": 5.5433
+    },
+    {
+      "feature": "fag",
+      "weight": 5.537
+    },
+    {
+      "feature": "fucker",
+      "weight": 5.5153
+    }
+  ],
+  "least_toxic": [
+    {
+      "feature": "thanks",
+      "weight": -4.3661
+    },
+    {
+      "feature": "talk",
+      "weight": -3.4878
+    },
+    {
+      "feature": "thank you",
+      "weight": -3.4486
+    },
+    {
+      "feature": "thank",
+      "weight": -3.3338
+    },
+    {
+      "feature": "please",
+      "weight": -3.0741
+    },
+    {
+      "feature": "wp",
+      "weight": -3.0366
+    },
+    {
+      "feature": "redirect",
+      "weight": -2.8743
+    },
+    {
+      "feature": "at",
+      "weight": -2.7607
+    },
+    {
+      "feature": "cheers",
+      "weight": -2.4522
+    },
+    {
+      "feature": "may",
+      "weight": -2.3673
+    },
+    {
+      "feature": "help",
+      "weight": -2.3312
+    },
+    {
+      "feature": "section",
+      "weight": -2.2667
+    },
+    {
+      "feature": "see",
+      "weight": -2.2576
+    },
+    {
+      "feature": "welcome",
+      "weight": -2.2483
+    },
+    {
+      "feature": "appreciate",
+      "weight": -2.227
+    },
+    {
+      "feature": "however",
+      "weight": -2.2193
+    },
+    {
+      "feature": "as",
+      "weight": -2.1342
+    },
+    {
+      "feature": "redirect talk",
+      "weight": -2.0668
+    },
+    {
+      "feature": "sources",
+      "weight": -2.0606
+    },
+    {
+      "feature": "article",
+      "weight": -2.0473
+    },
+    {
+      "feature": "wikiproject",
+      "weight": -2.0314
+    },
+    {
+      "feature": "there",
+      "weight": -2.0258
+    },
+    {
+      "feature": "ve",
+      "weight": -1.9972
+    },
+    {
+      "feature": "in",
+      "weight": -1.9918
+    },
+    {
+      "feature": "but",
+      "weight": -1.9065
+    },
+    {
+      "feature": "for",
+      "weight": -1.8802
+    },
+    {
+      "feature": "template",
+      "weight": -1.8763
+    },
+    {
+      "feature": "further",
+      "weight": -1.8619
+    },
+    {
+      "feature": "to",
+      "weight": -1.8246
+    },
+    {
+      "feature": "consensus",
+      "weight": -1.8038
+    }
+  ]
+}

@@ -55,15 +55,23 @@ LANG_ORDER = ["en", "tr", "es", "it"]
 # Loading helpers
 # --------------------------------------------------------------------------- #
 def load_all_results():
-    """Concatenate every ``*_results.csv`` in results/ into one DataFrame."""
+    """Concatenate every per-model ``*_results.csv`` in results/ into one DataFrame.
+
+    The combined output file (``all_results.csv``) is skipped so it is never fed
+    back into itself, which would duplicate rows on every run.
+    """
     frames = []
     for path in sorted(glob.glob(os.path.join(RESULTS_DIR, "*_results.csv"))):
+        if os.path.basename(path) == "all_results.csv":
+            continue
         df = pd.read_csv(path)
         if {"model", "split", "auc_roc"}.issubset(df.columns):
             frames.append(df)
     if not frames:
         return pd.DataFrame()
-    return pd.concat(frames, ignore_index=True)
+    combined = pd.concat(frames, ignore_index=True)
+    # Defensive de-dup in case a model was trained twice with identical settings.
+    return combined.drop_duplicates(subset=["model", "split"], keep="last")
 
 
 def load_pred_files(split_tag):
