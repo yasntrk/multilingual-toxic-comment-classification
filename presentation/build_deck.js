@@ -277,6 +277,90 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
+// SLIDE 6b — TF-IDF + LOGISTIC REGRESSION / SVM, EXPLAINED WITH SHAPES
+// =====================================================================
+{
+  const s = contentSlide("A Simple Model, Step by Step", "TF-IDF + LogReg / SVM");
+  s.addText("How does the simplest model decide? It just adds up a score for the words it knows.", {
+    x: 1.45, y: 1.6, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
+  });
+
+  // ----- horizontal pipeline of 4 stages -----
+  const stageY = 2.3, stageH = 0.6, stageW = 2.55, gap = 0.43;
+  const stages = [
+    ["1 · The comment", NAVY],
+    ["2 · Split into words", NAVY],
+    ["3 · Weigh each word", TEALD],
+    ["4 · Add up → decide", TEAL],
+  ];
+  let sx = 1.45;
+  stages.forEach(([t, c], i) => {
+    s.addShape(pptx.ShapeType.roundRect, { x: sx, y: stageY, w: stageW, h: stageH, rectRadius: 0.06, fill: { color: c }, line: { type: "none" } });
+    s.addText(t, { x: sx, y: stageY, w: stageW, h: stageH, align: "center", valign: "middle", fontFace: BFONT, fontSize: 13, bold: true, color: WHITE });
+    if (i < stages.length - 1) {
+      s.addText("→", { x: sx + stageW, y: stageY, w: gap, h: stageH, align: "center", valign: "middle", fontFace: HFONT, fontSize: 22, bold: true, color: MUTE });
+    }
+    sx += stageW + gap;
+  });
+
+  // ----- worked example below each stage -----
+  const exY = 3.25;
+  // Stage 1: the raw comment
+  card(s, 1.45, exY, stageW, 2.4, WHITE);
+  s.addText("“You are so stupid, just shut up.”", { x: 1.6, y: exY + 0.2, w: stageW - 0.3, h: 2.0, valign: "middle", fontFace: BFONT, fontSize: 14, italic: true, color: INK });
+
+  // Stage 2: split into words (chips)
+  const x2 = 1.45 + (stageW + gap);
+  card(s, x2, exY, stageW, 2.4, WHITE);
+  const words = ["you", "are", "so", "stupid", "just", "shut", "up"];
+  let wy = exY + 0.18;
+  words.forEach((w) => {
+    s.addShape(pptx.ShapeType.roundRect, { x: x2 + 0.55, y: wy, w: stageW - 1.1, h: 0.26, rectRadius: 0.04, fill: { color: "EEF3FA" }, line: { color: "D5DEEA", width: 0.5 } });
+    s.addText(w, { x: x2 + 0.55, y: wy, w: stageW - 1.1, h: 0.26, align: "center", valign: "middle", fontFace: BFONT, fontSize: 11, color: INK });
+    wy += 0.31;
+  });
+
+  // Stage 3: per-word weights table (rare + toxic words score high)
+  const x3 = 1.45 + 2 * (stageW + gap);
+  card(s, x3, exY, stageW, 2.4, WHITE);
+  const weights = [
+    ["stupid", "+2.4", RED],
+    ["shut", "+1.1", RED],
+    ["you", "+0.1", MUTE],
+    ["so", "+0.0", MUTE],
+    ["are", "−0.2", GREEN],
+  ];
+  let wy3 = exY + 0.22;
+  s.addText("word → weight", { x: x3 + 0.2, y: exY + 0.02, w: stageW - 0.4, h: 0.22, align: "center", fontFace: BFONT, fontSize: 10, bold: true, color: MUTE });
+  weights.forEach(([w, val, c]) => {
+    s.addText(w, { x: x3 + 0.3, y: wy3, w: 1.3, h: 0.32, valign: "middle", fontFace: BFONT, fontSize: 12.5, color: INK });
+    s.addText(val, { x: x3 + stageW - 1.3, y: wy3, w: 1.0, h: 0.32, align: "right", valign: "middle", fontFace: BFONT, fontSize: 12.5, bold: true, color: c });
+    wy3 += 0.4;
+  });
+
+  // Stage 4: sum → sigmoid → decision
+  const x4 = 1.45 + 3 * (stageW + gap);
+  card(s, x4, exY, stageW, 2.4, NAVY);
+  s.addText("sum of weights", { x: x4, y: exY + 0.2, w: stageW, h: 0.3, align: "center", fontFace: BFONT, fontSize: 11, color: ICE });
+  s.addText("+3.4", { x: x4, y: exY + 0.45, w: stageW, h: 0.6, align: "center", fontFace: HFONT, fontSize: 30, bold: true, color: TEAL });
+  s.addText("→  toxic probability", { x: x4, y: exY + 1.1, w: stageW, h: 0.3, align: "center", fontFace: BFONT, fontSize: 11, color: ICE });
+  s.addText("0.94", { x: x4, y: exY + 1.35, w: stageW, h: 0.5, align: "center", fontFace: HFONT, fontSize: 26, bold: true, color: WHITE });
+  s.addShape(pptx.ShapeType.roundRect, { x: x4 + 0.5, y: exY + 1.95, w: stageW - 1.0, h: 0.36, rectRadius: 0.05, fill: { color: RED }, line: { type: "none" } });
+  s.addText("TOXIC", { x: x4 + 0.5, y: exY + 1.95, w: stageW - 1.0, h: 0.36, align: "center", valign: "middle", fontFace: BFONT, fontSize: 13, bold: true, color: WHITE });
+
+  // ----- two takeaway notes -----
+  s.addText([
+    { text: "TF-IDF", options: { bold: true, color: TEALD } },
+    { text: " = how often a word appears, down-weighted if it is common everywhere. ", options: {} },
+    { text: "LogReg / SVM", options: { bold: true, color: TEALD } },
+    { text: " just learn one +/− weight per word and add them up.", options: {} },
+  ], { x: 1.45, y: 5.95, w: 11.3, h: 0.55, fontFace: BFONT, fontSize: 13.5, color: INK, lineSpacingMultiple: 1.1 });
+  s.addText("Catch: it knows no word order and only English words — so “aptal” or “stupido” score 0, and transfer collapses.", {
+    x: 1.45, y: 6.5, w: 11.3, h: 0.4, fontFace: BFONT, fontSize: 12.5, italic: true, color: RED,
+  });
+}
+
+// =====================================================================
 // SLIDE 7 — PROPOSED METHOD: ADAPTERS
 // =====================================================================
 {
@@ -325,7 +409,7 @@ function card(s, x, y, w, h, fill) {
     ["Early stopping", ["Keep the epoch with best multilingual score", "Word models overfit English and peak early", "avoids reporting a worse, later epoch"]],
     ["Metrics", ["AUC-ROC, F1, accuracy, precision, recall", "Per-language breakdown (tr / es / it)", "Trainable params + ms / sample"]],
     ["Cleaning", ["Aggressive ASCII clean → TF-IDF", "Unicode-preserving clean → LSTM / mBERT", "by design, to expose the gap"]],
-    ["Hardware", ["MacBook Air, Apple Silicon (MPS)", "Subsampled training for a few-hour budget", "PyTorch + HuggingFace + scikit-learn"]],
+    ["Hardware & time", ["Single NVIDIA RTX 3060 Ti GPU", "TF-IDF baselines: ~8–12 min · mBERT: ~2–3 h", "PyTorch + HuggingFace + scikit-learn"]],
   ];
   const cw = 3.78, ch = 2.2, gx = 0.18, gy = 0.25;
   let i = 0;
@@ -505,6 +589,41 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
+// SLIDE 10b — WHY DOES TRANSFER DIFFER BY LANGUAGE?
+// =====================================================================
+{
+  const s = contentSlide("Why Does Transfer Differ by Language?", "Reading the numbers");
+  s.addText("Same model, three languages, three different gains. Here is how we read those numbers — and where we are guessing.", {
+    x: 1.45, y: 1.6, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 15.5, italic: true, color: TEALD,
+  });
+
+  const cards = [
+    ["Turkish", "0.65 → 0.89", "+0.24", TEAL,
+      "Biggest jump. Not because Turkish is close to English — it isn't. mBERT simply saw a lot of Turkish while pretraining, and the classical baseline started very low, so there was the most room to gain."],
+    ["Spanish", "0.61 → 0.82", "+0.21", TEALD,
+      "Solid gain. Shares the Latin script and many roots with English, so toxic cues line up fairly well in mBERT's shared space."],
+    ["Italian", "0.60 → 0.77", "+0.17", NAVY,
+      "Smallest gain / hardest. Likely fewer toxic words overlap with what was seen in English training, so subtler insults slip through. (Partly our interpretation.)"],
+  ];
+  const cw = 3.78, gap = 0.18; let x = 1.45;
+  cards.forEach(([lang, arrow, delta, c, why]) => {
+    s.addShape(pptx.ShapeType.roundRect, { x, y: 2.3, w: cw, h: 3.75, rectRadius: 0.08, fill: { color: WHITE }, line: { color: c, width: 1.5 } });
+    s.addShape(pptx.ShapeType.rect, { x, y: 2.3, w: cw, h: 0.62, fill: { color: c } });
+    s.addText(lang, { x, y: 2.3, w: cw, h: 0.62, align: "center", valign: "middle", fontFace: HFONT, fontSize: 18, bold: true, color: WHITE });
+    s.addText(arrow, { x, y: 3.05, w: cw, h: 0.4, align: "center", fontFace: BFONT, fontSize: 14, color: MUTE });
+    s.addText(delta, { x, y: 3.4, w: cw, h: 0.6, align: "center", fontFace: HFONT, fontSize: 34, bold: true, color: c });
+    s.addText("AUC gain", { x, y: 4.02, w: cw, h: 0.3, align: "center", fontFace: BFONT, fontSize: 11, color: MUTE, charSpacing: 1 });
+    s.addText(why, { x: x + 0.28, y: 4.4, w: cw - 0.56, h: 1.55, fontFace: BFONT, fontSize: 12.5, color: INK, valign: "top" });
+    x += cw + gap;
+  });
+
+  s.addText([
+    { text: "Honest caveat:  ", options: { bold: true, color: RED } },
+    { text: "these are interpretations of the scores, not controlled experiments. The clear, measured fact is the ranking — Turkish gains most, Italian least; the “why” is our best explanation.", options: {} },
+  ], { x: 1.45, y: 6.2, w: 11.3, h: 0.7, fontFace: BFONT, fontSize: 13, color: INK, lineSpacingMultiple: 1.1 });
+}
+
+// =====================================================================
 // SLIDE 11 — EFFICIENCY: ADAPTER vs FULL
 // =====================================================================
 {
@@ -580,11 +699,63 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
-// SLIDE 12b — RELATED WORK / COMPARISON
+// SLIDE 12b — THE AUC PARADOX: HIGH AUC, LOW RECALL
+// =====================================================================
+{
+  const s = contentSlide("High AUC, but Misses Real Insults?", "Reading the metric");
+  s.addText("Turkish AUC is a strong 0.89 — yet the model lets many toxic comments through. Both are true. Here is why.", {
+    x: 1.45, y: 1.6, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 15.5, italic: true, color: TEALD,
+  });
+
+  // ----- left: the thermometer analogy -----
+  card(s, 1.45, 2.25, 5.5, 4.05, WHITE);
+  s.addText("Think of a thermometer", { x: 1.7, y: 2.4, w: 5.0, h: 0.4, fontFace: HFONT, fontSize: 16, bold: true, color: NAVY });
+  s.addText([
+    { text: "AUC asks: does the model give toxic comments a ", options: {} },
+    { text: "higher", options: { bold: true, color: TEAL } },
+    { text: " score than clean ones? ", options: {} },
+    { text: "Yes — its ranking is good (0.89).", options: { bold: true, color: TEAL } },
+  ], { x: 1.7, y: 2.85, w: 5.0, h: 0.95, fontFace: BFONT, fontSize: 13.5, color: INK, lineSpacingMultiple: 1.12 });
+  s.addText([
+    { text: "But the actual scores it gives Turkish toxicity are ", options: {} },
+    { text: "tiny", options: { bold: true, color: RED } },
+    { text: " — often 0.2%–0.5%. They are ranked correctly, just far below any sensible cut-off.", options: {} },
+  ], { x: 1.7, y: 3.85, w: 5.0, h: 1.0, fontFace: BFONT, fontSize: 13.5, color: INK, lineSpacingMultiple: 1.12 });
+  s.addText([
+    { text: "Recall asks a different question: ", options: {} },
+    { text: "did we actually flag them?", options: { bold: true, color: RED } },
+    { text: "  Since the scores sit so low, few cross the line — so recall stays low even when AUC is high.", options: {} },
+  ], { x: 1.7, y: 4.95, w: 5.0, h: 1.2, fontFace: BFONT, fontSize: 13.5, color: INK, lineSpacingMultiple: 1.12 });
+
+  // ----- right: censored missed-toxic (false negatives) -----
+  s.addText("Missed Turkish toxicity (false negatives)", { x: 7.2, y: 2.25, w: 5.6, h: 0.35, fontFace: HFONT, fontSize: 15, bold: true, color: RED });
+  const missed = [
+    ["S*** git, b** p**.", "0.2%"],
+    ["O****** ç*****, defol.", "0.4%"],
+    ["A**l herif, k*** kafalı.", "0.3%"],
+  ];
+  let my = 2.7;
+  missed.forEach(([txt, p]) => {
+    s.addShape(pptx.ShapeType.roundRect, { x: 7.2, y: my, w: 5.55, h: 0.78, rectRadius: 0.06, fill: { color: WHITE }, line: { color: RED, width: 1 } });
+    s.addShape(pptx.ShapeType.rect, { x: 7.2, y: my, w: 0.1, h: 0.78, fill: { color: RED } });
+    s.addText(txt, { x: 7.45, y: my, w: 3.7, h: 0.78, valign: "middle", fontFace: BFONT, fontSize: 14, italic: true, color: INK });
+    s.addText(p, { x: 11.2, y: my, w: 1.45, h: 0.78, align: "right", valign: "middle", fontFace: HFONT, fontSize: 18, bold: true, color: RED });
+    my += 0.9;
+  });
+  s.addText("Toxic probability the model assigned →  all far below the 5% threshold, so all were let through.", {
+    x: 7.2, y: 5.5, w: 5.55, h: 0.6, fontFace: BFONT, fontSize: 11.5, italic: true, color: MUTE,
+  });
+  s.addText("Profanity heavily censored. The model never saw these explicit Turkish words in English-only training.", {
+    x: 7.2, y: 6.1, w: 5.55, h: 0.6, fontFace: BFONT, fontSize: 11, italic: true, color: MUTE,
+  });
+}
+
+// =====================================================================
+// SLIDE 12c — RELATED WORK / COMPARISON
 // =====================================================================
 {
   const s = contentSlide("How We Compare to Other Work", "Related work");
-  s.addText("We are not the first to tackle multilingual toxicity. Here is how our laptop-scale result sits next to the literature.", {
+  s.addText("We are not the first to tackle multilingual toxicity. Here is how our single-GPU result sits next to the literature.", {
     x: 1.45, y: 1.62, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 15.5, italic: true, color: TEALD,
   });
 
@@ -593,7 +764,7 @@ function card(s, x, y, w, h, fill) {
     ["Jigsaw Kaggle winners (2020)", "XLM-R (large) + ensembles", "~0.95", "full test set · heavy GPUs"],
     ["Published mBERT cross-lingual", "full fine-tuning", "~0.80–0.85", "similar idea to ours"],
     ["Houlsby et al. (2019), adapters", "adapters on BERT", "≈ full  (−0.4%)", "shows adapters ≈ full tuning"],
-    ["Ours: mBERT + adapter", "adapters, English-only train", "0.83", "laptop · 1.34% params"],
+    ["Ours: mBERT + adapter", "adapters, English-only train", "0.83", "single GPU · 1.34% params"],
   ];
   const table = [head.map((h) => ({ text: h, options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left", fontSize: 13 } }))];
   rowsData.forEach((d, ri) => {
@@ -604,7 +775,7 @@ function card(s, x, y, w, h, fill) {
   s.addTable(table, { x: 1.45, y: 2.2, w: 11.3, colW: [3.5, 3.0, 2.2, 2.6], rowH: 0.5, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
 
   s.addText(bullets([
-    "The best public scores (~0.95) use far bigger models (XLM-R), many languages and ensembles — well beyond a laptop budget.",
+    "The best public scores (~0.95) use far bigger models (XLM-R), many languages and ensembles — well beyond a single-GPU budget.",
     "Our 0.83 lands in the same range as published mBERT cross-lingual results, even though we trained on English only.",
     "Adapter studies (Houlsby 2019; Pfeiffer MAD-X 2020) report adapters matching full fine-tuning — exactly the pattern we see (0.83 vs 0.85).",
   ], { fontSize: 13.5 }), { x: 1.45, y: 5.0, w: 11.3, h: 1.6 });
