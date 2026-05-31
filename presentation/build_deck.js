@@ -185,25 +185,39 @@ function card(s, x, y, w, h, fill) {
     "Source: Jigsaw Multilingual Toxic Comment Classification (Kaggle).",
     "Train: ~223K English comments, binary label.",
     "Validation: ~8K labelled multilingual (tr 3.0K · es 2.5K · it 2.5K).",
-    "Test: ~63K multilingual but unlabelled — so labelled cross-lingual evaluation uses the validation split.",
-  ], { fontSize: 14 }), { x: 1.45, y: 1.7, w: 5.55, h: 2.9 });
+    "Test: ~63K multilingual but unlabelled — labelled cross-lingual evaluation uses the validation split.",
+  ], { fontSize: 13.5 }), { x: 1.45, y: 1.65, w: 5.5, h: 2.4 });
 
-  // example snippets on the right
+  // where the data comes from
+  card(s, 1.45, 4.2, 5.5, 2.55, WHITE);
+  s.addShape(pptx.ShapeType.rect, { x: 1.45, y: 4.2, w: 5.5, h: 0.48, fill: { color: NAVY } });
+  s.addText("Where the data comes from", { x: 1.65, y: 4.2, w: 5.2, h: 0.48, valign: "middle", fontFace: HFONT, fontSize: 14, bold: true, color: WHITE });
+  s.addText(bullets([
+    "Released by Jigsaw (Google’s Conversation AI team) on Kaggle, 2020.",
+    "English comments: real Wikipedia talk-page edits + Civil Comments, reused from earlier Jigsaw challenges.",
+    "Multilingual val / test: non-English Wikipedia talk-page comments, newly gathered for this competition.",
+    "Toxicity labels assigned by human annotators.",
+  ], { fontSize: 11.5 }), { x: 1.7, y: 4.78, w: 5.05, h: 1.9 });
+
+  // example snippets on the right — one good + one bad per language shown
   const ex = [
     [GREEN, "NON-TOXIC · en", "“You, sir, are my hero. Any chance you remember what page that’s on?”"],
     [RED, "TOXIC · en", "“COCKS∗∗∗ER, before you piss around on my work…”"],
-    [RED, "TOXIC · it", "“Incazzato come sei, non sei pure tu un sockpuppet…”"],
+    [GREEN, "NON-TOXIC · tr", "“Eline sağlık, açıklaman çok işime yaradı, teşekkürler!”"],
+    [RED, "TOXIC · tr", "“Aptal herif, s∗∗tir git buradan.”"],
     [GREEN, "NON-TOXIC · es", "“Muchas gracias, LlamaAl. Sí que parece útil…”"],
+    [RED, "TOXIC · it", "“Incazzato come sei, non sei pure tu un sockpuppet…”"],
   ];
-  let y = 1.7, x = 7.25, w = 5.45;
+  let y = 1.55, x = 7.25, w = 5.45;
+  const ch = 0.78, step = 0.9;
   ex.forEach(([c, tag, txt]) => {
-    s.addShape(pptx.ShapeType.roundRect, { x, y, w, h: 1.18, rectRadius: 0.06, fill: { color: WHITE }, line: { color: "E2E8F0", width: 1 } });
-    s.addShape(pptx.ShapeType.rect, { x, y, w: 0.1, h: 1.18, fill: { color: c } });
-    s.addText(tag, { x: x + 0.25, y: y + 0.1, w: w - 0.4, h: 0.3, fontFace: BFONT, fontSize: 11, bold: true, color: c, charSpacing: 1 });
-    s.addText(txt, { x: x + 0.25, y: y + 0.38, w: w - 0.45, h: 0.75, fontFace: BFONT, fontSize: 12.5, italic: true, color: INK });
-    y += 1.3;
+    s.addShape(pptx.ShapeType.roundRect, { x, y, w, h: ch, rectRadius: 0.06, fill: { color: WHITE }, line: { color: "E2E8F0", width: 1 } });
+    s.addShape(pptx.ShapeType.rect, { x, y, w: 0.1, h: ch, fill: { color: c } });
+    s.addText(tag, { x: x + 0.25, y: y + 0.07, w: w - 0.4, h: 0.24, fontFace: BFONT, fontSize: 10, bold: true, color: c, charSpacing: 1 });
+    s.addText(txt, { x: x + 0.25, y: y + 0.31, w: w - 0.45, h: 0.44, valign: "top", fontFace: BFONT, fontSize: 11.5, italic: true, color: INK });
+    y += step;
   });
-  s.addText("Examples shortened / lightly censored for the slide.", { x: 7.25, y: 6.95, w: 5.4, h: 0.3, fontFace: BFONT, fontSize: 9, italic: true, color: MUTE, align: "right" });
+  s.addText("Examples shortened / censored for the slide.", { x: 7.25, y: 6.95, w: 5.4, h: 0.3, fontFace: BFONT, fontSize: 9, italic: true, color: MUTE, align: "right" });
 }
 
 // =====================================================================
@@ -598,22 +612,23 @@ function card(s, x, y, w, h, fill) {
   });
 
   const cards = [
-    ["Turkish", "0.65 → 0.89", "+0.24", TEAL,
+    ["Turkish", "≈ 3.0K eval comments", "0.65 → 0.89", "+0.24", TEAL,
       "Biggest jump. Not because Turkish is close to English — it isn't. mBERT simply saw a lot of Turkish while pretraining, and the classical baseline started very low, so there was the most room to gain."],
-    ["Spanish", "0.61 → 0.82", "+0.21", TEALD,
+    ["Spanish", "≈ 2.5K eval comments", "0.61 → 0.82", "+0.21", TEALD,
       "Solid gain. Shares the Latin script and many roots with English, so toxic cues line up fairly well in mBERT's shared space."],
-    ["Italian", "0.60 → 0.77", "+0.17", NAVY,
+    ["Italian", "≈ 2.5K eval comments", "0.60 → 0.77", "+0.17", NAVY,
       "Smallest gain / hardest. Likely fewer toxic words overlap with what was seen in English training, so subtler insults slip through. (Partly our interpretation.)"],
   ];
   const cw = 3.78, gap = 0.18; let x = 1.45;
-  cards.forEach(([lang, arrow, delta, c, why]) => {
+  cards.forEach(([lang, count, arrow, delta, c, why]) => {
     s.addShape(pptx.ShapeType.roundRect, { x, y: 2.3, w: cw, h: 3.75, rectRadius: 0.08, fill: { color: WHITE }, line: { color: c, width: 1.5 } });
     s.addShape(pptx.ShapeType.rect, { x, y: 2.3, w: cw, h: 0.62, fill: { color: c } });
     s.addText(lang, { x, y: 2.3, w: cw, h: 0.62, align: "center", valign: "middle", fontFace: HFONT, fontSize: 18, bold: true, color: WHITE });
-    s.addText(arrow, { x, y: 3.05, w: cw, h: 0.4, align: "center", fontFace: BFONT, fontSize: 14, color: MUTE });
-    s.addText(delta, { x, y: 3.4, w: cw, h: 0.6, align: "center", fontFace: HFONT, fontSize: 34, bold: true, color: c });
-    s.addText("AUC gain", { x, y: 4.02, w: cw, h: 0.3, align: "center", fontFace: BFONT, fontSize: 11, color: MUTE, charSpacing: 1 });
-    s.addText(why, { x: x + 0.28, y: 4.4, w: cw - 0.56, h: 1.55, fontFace: BFONT, fontSize: 12.5, color: INK, valign: "top" });
+    s.addText(count, { x, y: 2.97, w: cw, h: 0.28, align: "center", fontFace: BFONT, fontSize: 11, bold: true, color: MUTE, charSpacing: 1 });
+    s.addText(arrow, { x, y: 3.28, w: cw, h: 0.35, align: "center", fontFace: BFONT, fontSize: 13.5, color: MUTE });
+    s.addText(delta, { x, y: 3.6, w: cw, h: 0.55, align: "center", fontFace: HFONT, fontSize: 32, bold: true, color: c });
+    s.addText("AUC gain", { x, y: 4.16, w: cw, h: 0.28, align: "center", fontFace: BFONT, fontSize: 11, color: MUTE, charSpacing: 1 });
+    s.addText(why, { x: x + 0.28, y: 4.5, w: cw - 0.56, h: 1.5, fontFace: BFONT, fontSize: 12, color: INK, valign: "top" });
     x += cw + gap;
   });
 
