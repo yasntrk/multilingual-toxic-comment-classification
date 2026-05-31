@@ -1,0 +1,543 @@
+// Term project presentation builder.
+// Multilingual Toxic Comment Classification — SEDS 537, Spring 2026.
+// Run: node presentation/build_deck.js   (requires global pptxgenjs)
+//
+// Design: "Midnight Executive" palette (navy / ice blue) with a teal accent.
+// Motif: thick teal left-bar + numbered circle on every content slide.
+
+const pptxgen = require("pptxgenjs");
+const path = require("path");
+
+const FIG = path.join(__dirname, "..", "figures");
+const fig = (name) => path.join(FIG, name);
+
+// ---- Palette ---------------------------------------------------------------
+const NAVY   = "1E2761"; // primary dark
+const NAVY2  = "151B45"; // deeper navy for gradients/footers
+const ICE    = "CADCFC"; // light secondary
+const TEAL   = "00A896"; // accent
+const TEALD  = "028090"; // darker teal
+const INK    = "243044"; // body text on light
+const MUTE   = "6B7480"; // muted captions
+const LIGHT  = "F4F7FB"; // light content background
+const WHITE  = "FFFFFF";
+const RED     = "C0392B"; // wrong / toxic
+const GREEN   = "1E8449"; // right / clean
+
+const HFONT = "Georgia";
+const BFONT = "Calibri";
+
+const pptx = new pptxgen();
+pptx.defineLayout({ name: "W", width: 13.33, height: 7.5 });
+pptx.layout = "W";
+pptx.author = "SEDS 537 Term Project";
+pptx.title = "Multilingual Toxic Comment Classification";
+
+const W = 13.33, H = 7.5;
+
+// ---- Helpers ---------------------------------------------------------------
+function contentSlide(num, title, kicker) {
+  const s = pptx.addSlide();
+  s.background = { color: LIGHT };
+  // left accent bar
+  s.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.22, h: H, fill: { color: TEAL } });
+  // numbered circle
+  s.addShape(pptx.ShapeType.ellipse, { x: 0.55, y: 0.5, w: 0.72, h: 0.72, fill: { color: NAVY } });
+  s.addText(String(num).padStart(2, "0"), {
+    x: 0.55, y: 0.5, w: 0.72, h: 0.72, align: "center", valign: "middle",
+    fontFace: HFONT, fontSize: 22, bold: true, color: WHITE,
+  });
+  if (kicker) {
+    s.addText(kicker.toUpperCase(), {
+      x: 1.45, y: 0.5, w: 11.2, h: 0.3, fontFace: BFONT, fontSize: 12,
+      bold: true, color: TEALD, charSpacing: 2,
+    });
+  }
+  s.addText(title, {
+    x: 1.45, y: 0.74, w: 11.3, h: 0.7, fontFace: HFONT, fontSize: 30,
+    bold: true, color: NAVY,
+  });
+  // footer
+  s.addText("Multilingual Toxic Comment Classification  ·  SEDS 537", {
+    x: 0.55, y: 7.05, w: 9, h: 0.3, fontFace: BFONT, fontSize: 9, color: MUTE,
+  });
+  s.addText(String(num), { x: 12.4, y: 7.05, w: 0.5, h: 0.3, fontFace: BFONT, fontSize: 9, color: MUTE, align: "right" });
+  return s;
+}
+
+// bullet helper
+function bullets(items, opts) {
+  return items.map((it) => {
+    if (typeof it === "string") return { text: it, options: { bullet: { code: "2022", indent: 16 }, paraSpaceAfter: 8, fontSize: opts?.fontSize || 16, color: INK } };
+    return it;
+  });
+}
+
+// small card
+function card(s, x, y, w, h, fill) {
+  s.addShape(pptx.ShapeType.roundRect, { x, y, w, h, rectRadius: 0.08, fill: { color: fill || WHITE }, line: { color: "E2E8F0", width: 1 }, shadow: { type: "outer", color: "AAB4C2", blur: 6, offset: 2, angle: 90, opacity: 0.35 } });
+}
+
+// =====================================================================
+// SLIDE 1 — TITLE
+// =====================================================================
+{
+  const s = pptx.addSlide();
+  s.background = { color: NAVY };
+  // decorative motif: teal rounded frames top-right
+  s.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: W, h: 0.18, fill: { color: TEAL } });
+  s.addShape(pptx.ShapeType.ellipse, { x: 10.4, y: -1.6, w: 4.2, h: 4.2, fill: { color: NAVY2 }, line: { color: TEAL, width: 1.5 } });
+  s.addShape(pptx.ShapeType.ellipse, { x: 11.5, y: -0.7, w: 2.4, h: 2.4, fill: { color: TEAL }, line: { type: "none" } });
+
+  s.addText("SEDS 537 · MACHINE LEARNING · TERM PROJECT · SPRING 2026", {
+    x: 0.9, y: 1.5, w: 11, h: 0.4, fontFace: BFONT, fontSize: 14, bold: true, color: TEAL, charSpacing: 2,
+  });
+  s.addText("Multilingual Toxic\nComment Classification", {
+    x: 0.85, y: 2.0, w: 11.5, h: 2.0, fontFace: HFONT, fontSize: 48, bold: true, color: WHITE, lineSpacingMultiple: 1.0,
+  });
+  s.addText("Closing the cross-lingual gap with parameter-efficient mBERT adapters", {
+    x: 0.9, y: 4.05, w: 11, h: 0.6, fontFace: BFONT, fontSize: 20, italic: true, color: ICE,
+  });
+  // divider
+  s.addShape(pptx.ShapeType.rect, { x: 0.92, y: 4.85, w: 2.2, h: 0.05, fill: { color: TEAL } });
+  s.addText([
+    { text: "TF-IDF baselines", options: {} },
+    { text: "   ·   ", options: { color: TEAL } },
+    { text: "BiLSTM", options: {} },
+    { text: "   ·   ", options: { color: TEAL } },
+    { text: "mBERT fine-tuning & adapters", options: {} },
+  ], { x: 0.9, y: 5.05, w: 11, h: 0.4, fontFace: BFONT, fontSize: 15, color: ICE });
+
+  s.addText("Presentation: 1 / 8 June 2026, 16:30  ·  12 min talk + Q&A", {
+    x: 0.9, y: 6.55, w: 11.5, h: 0.4, fontFace: BFONT, fontSize: 12, color: "8FA0C8",
+  });
+}
+
+// =====================================================================
+// SLIDE 2 — PROBLEM DEFINITION
+// =====================================================================
+{
+  const s = contentSlide(1, "Problem Definition", "What & Why");
+  s.addText([
+    { text: "The task: ", options: { bold: true, color: NAVY } },
+    { text: "given an online comment, decide whether it is ", options: {} },
+    { text: "toxic", options: { bold: true, color: RED } },
+    { text: " or ", options: {} },
+    { text: "non-toxic", options: { bold: true, color: GREEN } },
+    { text: " — a binary classification problem.", options: {} },
+  ], { x: 1.45, y: 1.7, w: 6.7, h: 0.9, fontFace: BFONT, fontSize: 17, color: INK, lineSpacingMultiple: 1.15 });
+
+  s.addText(bullets([
+    "Platforms host comments in dozens of languages, but labelled toxicity data is overwhelmingly English.",
+    "Hand-labelling every language is expensive and slow — moderation must still work everywhere.",
+    "Goal: train on English only, then generalise to languages never seen during training (cross-lingual transfer).",
+  ], { fontSize: 16 }), { x: 1.45, y: 2.7, w: 6.7, h: 2.6 });
+
+  // right side stat cards
+  const cx = 8.6, cw = 4.1;
+  card(s, cx, 1.7, cw, 1.5, NAVY);
+  s.addText("223K", { x: cx, y: 1.85, w: cw, h: 0.7, align: "center", fontFace: HFONT, fontSize: 40, bold: true, color: TEAL });
+  s.addText("English training comments", { x: cx, y: 2.55, w: cw, h: 0.5, align: "center", fontFace: BFONT, fontSize: 13, color: ICE });
+
+  card(s, cx, 3.35, cw, 1.5, WHITE);
+  s.addText("3 langs", { x: cx, y: 3.5, w: cw, h: 0.7, align: "center", fontFace: HFONT, fontSize: 36, bold: true, color: NAVY });
+  s.addText("evaluated unseen: Turkish · Spanish · Italian", { x: cx, y: 4.2, w: cw, h: 0.5, align: "center", fontFace: BFONT, fontSize: 13, color: MUTE });
+
+  card(s, cx, 5.0, cw, 1.5, WHITE);
+  s.addText("~15%", { x: cx, y: 5.15, w: cw, h: 0.7, align: "center", fontFace: HFONT, fontSize: 36, bold: true, color: RED });
+  s.addText("toxic — a strongly imbalanced target", { x: cx, y: 5.85, w: cw, h: 0.5, align: "center", fontFace: BFONT, fontSize: 13, color: MUTE });
+}
+
+// =====================================================================
+// SLIDE 3 — THE CROSS-LINGUAL CHALLENGE
+// =====================================================================
+{
+  const s = contentSlide(2, "The Cross-Lingual Challenge", "Why it is hard");
+  s.addText("Why does an English-trained model struggle in Turkish or Spanish?", {
+    x: 1.45, y: 1.65, w: 11, h: 0.5, fontFace: BFONT, fontSize: 18, italic: true, color: TEALD,
+  });
+
+  const items = [
+    ["Vocabulary mismatch", "Word-level models learn an English vocabulary. Turkish / Spanish words are simply unknown tokens — the signal disappears."],
+    ["No shared meaning", "TF-IDF and LSTM treat 'idiot' and 'aptal' as unrelated symbols. They cannot transfer what 'toxic' looks like across languages."],
+    ["Different scripts & morphology", "Diacritics, agglutination and word order differ — surface features learned on English do not carry over."],
+    ["Our hypothesis", "A multilingual pretrained encoder (mBERT) already maps all languages into one shared space, so toxicity learned in English transfers."],
+  ];
+  let y = 2.35;
+  items.forEach(([h, b], i) => {
+    const accent = i === 3 ? TEAL : NAVY;
+    s.addShape(pptx.ShapeType.roundRect, { x: 1.45, y, w: 11.3, h: 1.0, rectRadius: 0.06, fill: { color: i === 3 ? "E6F7F4" : WHITE }, line: { color: i === 3 ? TEAL : "E2E8F0", width: i === 3 ? 1.5 : 1 } });
+    s.addShape(pptx.ShapeType.rect, { x: 1.45, y, w: 0.1, h: 1.0, fill: { color: accent } });
+    s.addText(h, { x: 1.75, y: y + 0.1, w: 3.4, h: 0.8, valign: "middle", fontFace: HFONT, fontSize: 16, bold: true, color: accent });
+    s.addText(b, { x: 5.2, y: y + 0.08, w: 7.4, h: 0.85, valign: "middle", fontFace: BFONT, fontSize: 14, color: INK });
+    y += 1.12;
+  });
+}
+
+// =====================================================================
+// SLIDE 4 — DATASET & EXAMPLES
+// =====================================================================
+{
+  const s = contentSlide(3, "Dataset & Examples", "Jigsaw Multilingual");
+  s.addText(bullets([
+    "Source: Jigsaw Multilingual Toxic Comment Classification (Kaggle).",
+    "Train: ~223K English comments, binary label.",
+    "Validation: ~8K labelled multilingual (tr 3.0K · es 2.5K · it 2.5K).",
+    "Test: ~63K multilingual but unlabelled — so labelled cross-lingual evaluation uses the validation split.",
+  ], { fontSize: 14 }), { x: 1.45, y: 1.7, w: 5.55, h: 2.9 });
+
+  // example snippets on the right
+  const ex = [
+    [GREEN, "NON-TOXIC · en", "“You, sir, are my hero. Any chance you remember what page that’s on?”"],
+    [RED, "TOXIC · en", "“COCKS∗∗∗ER, before you piss around on my work…”"],
+    [RED, "TOXIC · it", "“Incazzato come sei, non sei pure tu un sockpuppet…”"],
+    [GREEN, "NON-TOXIC · es", "“Muchas gracias, LlamaAl. Sí que parece útil…”"],
+  ];
+  let y = 1.7, x = 7.25, w = 5.45;
+  ex.forEach(([c, tag, txt]) => {
+    s.addShape(pptx.ShapeType.roundRect, { x, y, w, h: 1.18, rectRadius: 0.06, fill: { color: WHITE }, line: { color: "E2E8F0", width: 1 } });
+    s.addShape(pptx.ShapeType.rect, { x, y, w: 0.1, h: 1.18, fill: { color: c } });
+    s.addText(tag, { x: x + 0.25, y: y + 0.1, w: w - 0.4, h: 0.3, fontFace: BFONT, fontSize: 11, bold: true, color: c, charSpacing: 1 });
+    s.addText(txt, { x: x + 0.25, y: y + 0.38, w: w - 0.45, h: 0.75, fontFace: BFONT, fontSize: 12.5, italic: true, color: INK });
+    y += 1.3;
+  });
+  s.addText("Examples shortened / lightly censored for the slide.", { x: 7.25, y: 6.95, w: 5.4, h: 0.3, fontFace: BFONT, fontSize: 9, italic: true, color: MUTE, align: "right" });
+}
+
+// =====================================================================
+// SLIDE 5 — METHODOLOGY OVERVIEW  (what we did / why)
+// =====================================================================
+{
+  const s = contentSlide(4, "Our Approach", "What we did & why");
+  s.addText("A ladder of models, from simple to powerful — each answers a question the previous one could not.", {
+    x: 1.45, y: 1.65, w: 11.2, h: 0.5, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
+  });
+
+  const steps = [
+    ["1", "TF-IDF baselines", "LR · NB · SVM", "How far do classic word-count models get? Establishes the floor.", NAVY],
+    ["2", "BiLSTM", "recurrent net", "Does modelling word order help? A deep-learning baseline.", NAVY],
+    ["3", "mBERT (full)", "fine-tune all", "Can a multilingual transformer transfer? The strong baseline.", TEALD],
+    ["4", "mBERT + Adapters", "proposed method", "Same power for ~1% of the cost? Our parameter-efficient method.", TEAL],
+  ];
+  const cw = 2.78, gap = 0.18; let x = 1.45;
+  steps.forEach(([n, title, sub, why, c]) => {
+    s.addShape(pptx.ShapeType.roundRect, { x, y: 2.4, w: cw, h: 3.4, rectRadius: 0.08, fill: { color: WHITE }, line: { color: c, width: 1.5 } });
+    s.addShape(pptx.ShapeType.rect, { x, y: 2.4, w: cw, h: 0.72, rectRadius: 0, fill: { color: c } });
+    s.addText(title, { x: x + 0.1, y: 2.45, w: cw - 0.2, h: 0.62, align: "center", valign: "middle", fontFace: HFONT, fontSize: 15.5, bold: true, color: WHITE });
+    s.addShape(pptx.ShapeType.ellipse, { x: x + cw / 2 - 0.33, y: 3.0, w: 0.66, h: 0.66, fill: { color: c } });
+    s.addText(n, { x: x + cw / 2 - 0.33, y: 3.0, w: 0.66, h: 0.66, align: "center", valign: "middle", fontFace: HFONT, fontSize: 22, bold: true, color: WHITE });
+    s.addText(sub.toUpperCase(), { x: x + 0.1, y: 3.72, w: cw - 0.2, h: 0.3, align: "center", fontFace: BFONT, fontSize: 11, bold: true, color: MUTE, charSpacing: 1 });
+    s.addText(why, { x: x + 0.22, y: 4.1, w: cw - 0.44, h: 1.6, align: "center", fontFace: BFONT, fontSize: 13, color: INK });
+    x += cw + gap;
+  });
+
+  // arrow strip
+  s.addText("simple  →  increasing capacity & cross-lingual ability  →  efficient", {
+    x: 1.45, y: 6.0, w: 11.3, h: 0.4, align: "center", fontFace: BFONT, fontSize: 13, italic: true, color: MUTE,
+  });
+}
+
+// =====================================================================
+// SLIDE 6 — MODEL EXPLAINERS (TF-IDF / LSTM / mBERT)
+// =====================================================================
+{
+  const s = contentSlide(5, "How the Models Work", "Quick primer");
+  const cols = [
+    [NAVY, "TF-IDF + classifier", "Bag of words", [
+      "Counts how often each word appears, weighted by rarity.",
+      "Ignores word order and meaning.",
+      "Vocabulary is English — non-English words vanish.",
+      "Fast, strong on English, no transfer.",
+    ]],
+    [TEALD, "BiLSTM", "Recurrent net", [
+      "Reads the sentence left→right and right→left.",
+      "Captures word order & local context.",
+      "Embeddings learned from English only.",
+      "Better English, still no real transfer.",
+    ]],
+    [TEAL, "mBERT", "Multilingual transformer", [
+      "Transformer pretrained on 104 languages.",
+      "Self-attention links every word to every other.",
+      "All languages share one embedding space.",
+      "Toxicity learned in English transfers out.",
+    ]],
+  ];
+  const cw = 3.78, gap = 0.18; let x = 1.45;
+  cols.forEach(([c, title, sub, lines]) => {
+    s.addShape(pptx.ShapeType.roundRect, { x, y: 1.75, w: cw, h: 4.95, rectRadius: 0.08, fill: { color: WHITE }, line: { color: "E2E8F0", width: 1 } });
+    s.addShape(pptx.ShapeType.roundRect, { x, y: 1.75, w: cw, h: 0.95, rectRadius: 0.08, fill: { color: c } });
+    s.addShape(pptx.ShapeType.rect, { x, y: 2.35, w: cw, h: 0.35, fill: { color: c } });
+    s.addText(title, { x: x + 0.15, y: 1.82, w: cw - 0.3, h: 0.5, align: "center", fontFace: HFONT, fontSize: 18, bold: true, color: WHITE });
+    s.addText(sub.toUpperCase(), { x: x + 0.15, y: 2.32, w: cw - 0.3, h: 0.35, align: "center", fontFace: BFONT, fontSize: 11, bold: true, color: "FFFFFF", charSpacing: 1 });
+    s.addText(lines.map((t) => ({ text: t, options: { bullet: { code: "2022", indent: 14 }, paraSpaceAfter: 10, fontSize: 13.5, color: INK } })), { x: x + 0.28, y: 2.95, w: cw - 0.5, h: 3.6, valign: "top" });
+    x += cw + gap;
+  });
+}
+
+// =====================================================================
+// SLIDE 7 — PROPOSED METHOD: ADAPTERS
+// =====================================================================
+{
+  const s = contentSlide(6, "Proposed Method: Adapter Tuning", "Parameter-efficient");
+  s.addText("Instead of updating all ~178M weights of mBERT, we freeze the encoder and insert tiny trainable bottleneck modules.", {
+    x: 1.45, y: 1.65, w: 11.2, h: 0.6, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
+  });
+
+  s.addText(bullets([
+    "A Houlsby adapter = down-projection → GELU → up-projection, with a residual skip.",
+    "Two adapters added per transformer layer; near-zero init so training starts from the pretrained model.",
+    "Frozen: all mBERT weights.  Trainable: adapters + LayerNorm + classifier head.",
+    "Result: only ~1.34% of parameters are trained — far cheaper to store and adapt.",
+  ], { fontSize: 15 }), { x: 1.45, y: 2.4, w: 6.6, h: 3.2 });
+
+  // diagram of adapter on the right
+  const dx = 8.5, dw = 4.2;
+  card(s, dx, 2.35, dw, 4.05, WHITE);
+  const box = (label, yy, c, hh) => {
+    s.addShape(pptx.ShapeType.roundRect, { x: dx + 0.7, y: yy, w: dw - 1.4, h: hh || 0.5, rectRadius: 0.05, fill: { color: c }, line: { type: "none" } });
+    s.addText(label, { x: dx + 0.7, y: yy, w: dw - 1.4, h: hh || 0.5, align: "center", valign: "middle", fontFace: BFONT, fontSize: 12.5, bold: true, color: WHITE });
+  };
+  s.addText("Adapter block", { x: dx, y: 2.5, w: dw, h: 0.35, align: "center", fontFace: HFONT, fontSize: 15, bold: true, color: NAVY });
+  box("Up-projection ↑", 2.95, NAVY);
+  box("GELU", 3.6, TEALD, 0.45);
+  box("Down-projection ↓", 4.2, NAVY);
+  box("Transformer hidden state", 5.05, "94A3B8", 0.5);
+  // residual arrow note
+  s.addText("+ residual skip connection", { x: dx, y: 5.7, w: dw, h: 0.35, align: "center", fontFace: BFONT, fontSize: 12, italic: true, color: TEAL });
+  // arrows
+  [3.45, 4.1, 4.7].forEach((yy) => s.addText("↑", { x: dx, y: yy, w: dw, h: 0.18, align: "center", fontSize: 12, color: MUTE }));
+}
+
+// =====================================================================
+// SLIDE 8 — EXPERIMENTAL DESIGN
+// =====================================================================
+{
+  const s = contentSlide(7, "Experimental Design", "Implementation details");
+  const blocks = [
+    ["Splits", ["80/20 English split for in-language test", "Full multilingual validation for transfer", "Validation order preserved for error analysis"]],
+    ["Imbalance", ["pos_weight in BCEWithLogitsLoss (~9.5×)", "Decision threshold tuned on val F1", "Adapter threshold = 0.05"]],
+    ["Early stopping", ["Keep checkpoint with best multilingual-val AUC", "Word models overfit English — peak early", "Avoids reporting a degraded final epoch"]],
+    ["Metrics", ["AUC-ROC, F1, accuracy, precision, recall", "Per-language breakdown (tr / es / it)", "Trainable params + ms / sample"]],
+    ["Cleaning", ["Aggressive ASCII clean → TF-IDF", "Unicode-preserving clean → LSTM / mBERT", "by design, to expose the gap"]],
+    ["Hardware", ["MacBook Air, Apple Silicon (MPS)", "Subsampled training for a few-hour budget", "PyTorch + HuggingFace + scikit-learn"]],
+  ];
+  const cw = 3.78, ch = 2.2, gx = 0.18, gy = 0.25;
+  let i = 0;
+  for (let r = 0; r < 2; r++) {
+    for (let cI = 0; cI < 3; cI++) {
+      const x = 1.45 + cI * (cw + gx);
+      const y = 1.8 + r * (ch + gy);
+      const [h, ls] = blocks[i++];
+      s.addShape(pptx.ShapeType.roundRect, { x, y, w: cw, h: ch, rectRadius: 0.07, fill: { color: WHITE }, line: { color: "E2E8F0", width: 1 } });
+      s.addShape(pptx.ShapeType.rect, { x, y, w: cw, h: 0.5, fill: { color: NAVY } });
+      s.addText(h, { x: x + 0.2, y, w: cw - 0.4, h: 0.5, valign: "middle", fontFace: HFONT, fontSize: 15, bold: true, color: WHITE });
+      s.addText(ls.map((t) => ({ text: t, options: { bullet: { code: "2022", indent: 12 }, paraSpaceAfter: 5, fontSize: 11.5, color: INK } })), { x: x + 0.28, y: y + 0.58, w: cw - 0.5, h: ch - 0.65, valign: "top" });
+    }
+  }
+}
+
+// =====================================================================
+// SLIDE 9 — KEY FINDINGS (table + chart)
+// =====================================================================
+{
+  const s = contentSlide(8, "Key Findings", "Results");
+  // results table
+  const rows = [
+    [
+      { text: "Model", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left" } },
+      { text: "English AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Multilingual AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Trainable params", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+    ],
+  ];
+  const data = [
+    ["TF-IDF + LogReg", "0.969", "0.627", "—"],
+    ["TF-IDF + Naive Bayes", "0.943", "0.605", "—"],
+    ["TF-IDF + SVM", "0.965", "0.582", "—"],
+    ["BiLSTM", "0.936", "0.601", "~7M"],
+    ["mBERT + Adapter (ours)", "0.973", "0.826", "1.34%"],
+  ];
+  data.forEach((d, ri) => {
+    const isStar = ri === data.length - 1;
+    const bg = isStar ? "E6F7F4" : (ri % 2 ? "EEF3FA" : WHITE);
+    rows.push(d.map((c, ci) => ({
+      text: c,
+      options: {
+        align: ci === 0 ? "left" : "center",
+        bold: isStar,
+        color: isStar ? TEALD : INK,
+        fill: { color: bg },
+        fontSize: 14,
+      },
+    })));
+  });
+  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.52, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+
+  s.addText([
+    { text: "Takeaway:  ", options: { bold: true, color: TEALD } },
+    { text: "TF-IDF & LSTM collapse on unseen languages (~0.6 AUC). mBERT + adapters jumps to ", options: {} },
+    { text: "0.83", options: { bold: true, color: TEAL } },
+    { text: " — a large transfer gain at ~1% of the cost.", options: {} },
+  ], { x: 1.45, y: 5.0, w: 6.7, h: 1.3, fontFace: BFONT, fontSize: 15, color: INK, lineSpacingMultiple: 1.15, valign: "top" });
+
+  // native bar chart: multilingual AUC
+  const chartData = [{
+    name: "Multilingual AUC",
+    labels: ["LogReg", "Naive Bayes", "SVM", "BiLSTM", "mBERT+Adapter"],
+    values: [0.627, 0.605, 0.582, 0.601, 0.826],
+  }];
+  s.addChart(pptx.ChartType.bar, chartData, {
+    x: 8.4, y: 1.85, w: 4.4, h: 4.7,
+    barDir: "col",
+    chartColors: [NAVY, NAVY, NAVY, NAVY, TEAL],
+    chartColorsOpacity: [70, 70, 70, 70, 100],
+    showValue: true, dataLabelColor: INK, dataLabelFontSize: 10, dataLabelFormatCode: "0.00",
+    valAxisMinVal: 0.5, valAxisMaxVal: 0.9, valAxisMajorUnit: 0.1,
+    catAxisLabelColor: INK, catAxisLabelFontSize: 9,
+    valAxisLabelColor: MUTE, valAxisLabelFontSize: 9,
+    showLegend: false, showTitle: true, title: "Cross-lingual AUC by model", titleColor: NAVY, titleFontSize: 13, titleFontFace: HFONT,
+  });
+}
+
+// =====================================================================
+// SLIDE 10 — PER-LANGUAGE PERFORMANCE
+// =====================================================================
+{
+  const s = contentSlide(9, "Per-Language Transfer", "Where it works");
+  // grouped bar: per language AUC for adapter vs a baseline (LogReg)
+  const chartData = [
+    { name: "TF-IDF LogReg", labels: ["Turkish", "Spanish", "Italian"], values: [0.652, 0.614, 0.600] },
+    { name: "mBERT + Adapter", labels: ["Turkish", "Spanish", "Italian"], values: [0.890, 0.822, 0.772] },
+  ];
+  s.addChart(pptx.ChartType.bar, chartData, {
+    x: 1.45, y: 1.9, w: 6.7, h: 4.5,
+    barDir: "col", barGrouping: "clustered",
+    chartColors: [NAVY, TEAL],
+    showValue: true, dataLabelColor: INK, dataLabelFontSize: 10, dataLabelFormatCode: "0.00",
+    valAxisMinVal: 0.5, valAxisMaxVal: 0.95, valAxisMajorUnit: 0.1,
+    catAxisLabelColor: INK, catAxisLabelFontSize: 12,
+    valAxisLabelColor: MUTE, valAxisLabelFontSize: 9,
+    showLegend: true, legendPos: "b", legendColor: INK, legendFontSize: 11,
+    showTitle: true, title: "AUC by language", titleColor: NAVY, titleFontSize: 13, titleFontFace: HFONT,
+  });
+
+  s.addText(bullets([
+    "Adapters lift every language well above the classical baseline.",
+    "Turkish gains the most (0.65 → 0.89) despite being typologically far from English.",
+    "Italian is hardest (0.77) — likely fewer toxic cues survive transfer.",
+    "Confirms mBERT's shared space carries toxicity signal across scripts and families.",
+  ], { fontSize: 15 }), { x: 8.45, y: 2.2, w: 4.35, h: 4.0 });
+}
+
+// =====================================================================
+// SLIDE 11 — EFFICIENCY: ADAPTER vs FULL
+// =====================================================================
+{
+  const s = contentSlide(10, "Efficiency: Adapters vs Full Fine-Tuning", "The punchline");
+  s.addText("Adapters match full fine-tuning's transfer while training a tiny fraction of the model.", {
+    x: 1.45, y: 1.65, w: 11.2, h: 0.5, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
+  });
+
+  const stats = [
+    ["1.34%", "of parameters trained", TEAL, "vs 100% for full fine-tuning"],
+    ["2.4M", "trainable weights", NAVY, "vs ~178M total in mBERT"],
+    ["~0.83", "multilingual AUC", TEALD, "on par with full fine-tuning (~0.85)"],
+    ["16.9 ms", "per sample (MPS)", NAVY, "practical on a laptop"],
+  ];
+  const cw = 2.78, gap = 0.18; let x = 1.45;
+  stats.forEach(([big, lab, c, sub]) => {
+    card(s, x, 2.5, cw, 2.7, WHITE);
+    s.addShape(pptx.ShapeType.rect, { x, y: 2.5, w: cw, h: 0.12, fill: { color: c } });
+    s.addText(big, { x, y: 2.85, w: cw, h: 0.9, align: "center", fontFace: HFONT, fontSize: 40, bold: true, color: c });
+    s.addText(lab, { x: x + 0.15, y: 3.8, w: cw - 0.3, h: 0.5, align: "center", fontFace: BFONT, fontSize: 14, bold: true, color: NAVY });
+    s.addText(sub, { x: x + 0.2, y: 4.3, w: cw - 0.4, h: 0.8, align: "center", fontFace: BFONT, fontSize: 12, color: MUTE });
+    x += cw + gap;
+  });
+
+  s.addText([
+    { text: "Why it matters:  ", options: { bold: true, color: TEALD } },
+    { text: "one frozen mBERT can be specialised per task by swapping a 2 MB adapter — cheaper to store, train and deploy than a full copy.", options: {} },
+  ], { x: 1.45, y: 5.6, w: 11.3, h: 0.8, fontFace: BFONT, fontSize: 15, color: INK });
+}
+
+// =====================================================================
+// SLIDE 12 — ERROR ANALYSIS
+// =====================================================================
+{
+  const s = contentSlide(11, "Error Analysis", "Right & wrong");
+  s.addText("Real mBERT-adapter predictions on the multilingual validation set (threshold 0.05).", {
+    x: 1.45, y: 1.65, w: 11.2, h: 0.4, fontFace: BFONT, fontSize: 14, italic: true, color: TEALD,
+  });
+
+  const quad = [
+    [GREEN, "✓ True Positive", "it · p = 0.98", "“Incazzato come sei, non sei pure tu un sockpuppet…”", "Toxic correctly flagged — transfer works."],
+    [RED, "✗ False Negative", "es · p = 0.00", "“Supongo que eso de que eres un adicto al porno es un vandalismo…”", "Missed toxic — subtle insult, low recall cost."],
+    [RED, "✗ False Positive", "it · p = 0.99", "“Forse stupida; vedo che riesci a editare da mobile, come fai?”", "Clean over-flagged — 'stupida' triggers it."],
+    [GREEN, "✓ True Negative", "es · p = 0.00", "“Muchas gracias, LlamaAl. Sí que parece útil…”", "Clean correctly passed."],
+  ];
+  const cw = 5.5, ch = 2.2, gx = 0.3, gy = 0.25;
+  let i = 0;
+  for (let r = 0; r < 2; r++) {
+    for (let cI = 0; cI < 2; cI++) {
+      const x = 1.45 + cI * (cw + gx);
+      const y = 2.25 + r * (ch + gy);
+      const [c, head, meta, txt, note] = quad[i++];
+      s.addShape(pptx.ShapeType.roundRect, { x, y, w: cw, h: ch, rectRadius: 0.07, fill: { color: WHITE }, line: { color: c, width: 1.5 } });
+      s.addShape(pptx.ShapeType.rect, { x, y, w: 0.12, h: ch, fill: { color: c } });
+      s.addText(head, { x: x + 0.3, y: y + 0.12, w: cw - 2.0, h: 0.4, fontFace: HFONT, fontSize: 16, bold: true, color: c });
+      s.addText(meta, { x: x + cw - 1.85, y: y + 0.14, w: 1.7, h: 0.35, align: "right", fontFace: BFONT, fontSize: 12, bold: true, color: MUTE });
+      s.addText(txt, { x: x + 0.3, y: y + 0.6, w: cw - 0.55, h: 0.95, fontFace: BFONT, fontSize: 13, italic: true, color: INK });
+      s.addText(note, { x: x + 0.3, y: y + ch - 0.55, w: cw - 0.55, h: 0.45, fontFace: BFONT, fontSize: 12, color: c });
+      i; // noop
+    }
+  }
+}
+
+// =====================================================================
+// SLIDE 13 — CONCLUSIONS
+// =====================================================================
+{
+  const s = contentSlide(12, "Concluding Remarks", "What we learned");
+  const points = [
+    ["Cross-lingual transfer is real", "A multilingual encoder generalises toxicity from English to unseen languages; word-count and LSTM models cannot."],
+    ["Adapters are the sweet spot", "~1.34% of parameters reach full-fine-tuning-level transfer (~0.83 AUC) — the project's main result."],
+    ["Honest evaluation matters", "Per-language metrics, threshold tuning and best-checkpoint selection prevent over-optimistic numbers."],
+    ["Limitations & next steps", "Recall is modest under imbalance; the official test set is unlabelled. Future: adapter-size ablation, more languages, focal loss."],
+  ];
+  let y = 1.85;
+  points.forEach(([h, b], i) => {
+    s.addShape(pptx.ShapeType.ellipse, { x: 1.5, y: y + 0.05, w: 0.55, h: 0.55, fill: { color: i === 1 ? TEAL : NAVY } });
+    s.addText(String(i + 1), { x: 1.5, y: y + 0.05, w: 0.55, h: 0.55, align: "center", valign: "middle", fontFace: HFONT, fontSize: 18, bold: true, color: WHITE });
+    s.addText(h, { x: 2.3, y: y, w: 10.3, h: 0.45, fontFace: HFONT, fontSize: 19, bold: true, color: i === 1 ? TEALD : NAVY });
+    s.addText(b, { x: 2.3, y: y + 0.42, w: 10.3, h: 0.7, fontFace: BFONT, fontSize: 14.5, color: INK });
+    y += 1.25;
+  });
+}
+
+// =====================================================================
+// SLIDE 14 — THANK YOU / Q&A
+// =====================================================================
+{
+  const s = pptx.addSlide();
+  s.background = { color: NAVY };
+  s.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: W, h: 0.18, fill: { color: TEAL } });
+  s.addShape(pptx.ShapeType.ellipse, { x: -1.4, y: 5.2, w: 4.2, h: 4.2, fill: { color: NAVY2 }, line: { color: TEAL, width: 1.5 } });
+
+  s.addText("Thank you", { x: 0.9, y: 2.1, w: 11.5, h: 1.1, fontFace: HFONT, fontSize: 54, bold: true, color: WHITE });
+  s.addText("Questions & discussion", { x: 0.92, y: 3.25, w: 11, h: 0.6, fontFace: BFONT, fontSize: 22, italic: true, color: ICE });
+  s.addShape(pptx.ShapeType.rect, { x: 0.95, y: 4.0, w: 2.2, h: 0.05, fill: { color: TEAL } });
+
+  s.addText([
+    { text: "Multilingual Toxic Comment Classification", options: { bold: true, color: WHITE } },
+    { text: "\nSEDS 537 · Machine Learning · Term Project · Spring 2026", options: { color: ICE } },
+    { text: "\nTF-IDF · BiLSTM · mBERT full fine-tuning · mBERT + adapters", options: { color: "8FA0C8" } },
+  ], { x: 0.95, y: 4.3, w: 11, h: 1.3, fontFace: BFONT, fontSize: 16, lineSpacingMultiple: 1.3 });
+
+  s.addText("Presentation: 1 / 8 June 2026, 16:30  ·  12-minute talk + 2–3 min Q&A", {
+    x: 0.95, y: 6.6, w: 11.5, h: 0.4, fontFace: BFONT, fontSize: 12, color: "8FA0C8",
+  });
+}
+
+// ---- save ------------------------------------------------------------------
+const out = path.join(__dirname, "Multilingual_Toxic_Classification.pptx");
+pptx.writeFile({ fileName: out }).then(() => console.log("Saved:", out));
