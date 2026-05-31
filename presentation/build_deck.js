@@ -36,7 +36,9 @@ pptx.title = "Multilingual Toxic Comment Classification";
 const W = 13.33, H = 7.5;
 
 // ---- Helpers ---------------------------------------------------------------
-function contentSlide(num, title, kicker) {
+let _slideNum = 0;   // content slides auto-number themselves (title slide excluded)
+function contentSlide(title, kicker) {
+  const num = ++_slideNum;
   const s = pptx.addSlide();
   s.background = { color: LIGHT };
   // left accent bar
@@ -117,7 +119,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 2 — PROBLEM DEFINITION
 // =====================================================================
 {
-  const s = contentSlide(1, "Problem Definition", "What & Why");
+  const s = contentSlide("Problem Definition", "What & Why");
   s.addText([
     { text: "The task: ", options: { bold: true, color: NAVY } },
     { text: "given an online comment, decide whether it is ", options: {} },
@@ -152,7 +154,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 3 — THE CROSS-LINGUAL CHALLENGE
 // =====================================================================
 {
-  const s = contentSlide(2, "The Cross-Lingual Challenge", "Why it is hard");
+  const s = contentSlide("The Cross-Lingual Challenge", "Why it is hard");
   s.addText("Why does an English-trained model struggle in Turkish or Spanish?", {
     x: 1.45, y: 1.65, w: 11, h: 0.5, fontFace: BFONT, fontSize: 18, italic: true, color: TEALD,
   });
@@ -178,7 +180,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 4 — DATASET & EXAMPLES
 // =====================================================================
 {
-  const s = contentSlide(3, "Dataset & Examples", "Jigsaw Multilingual");
+  const s = contentSlide("Dataset & Examples", "Jigsaw Multilingual");
   s.addText(bullets([
     "Source: Jigsaw Multilingual Toxic Comment Classification (Kaggle).",
     "Train: ~223K English comments, binary label.",
@@ -208,7 +210,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 5 — METHODOLOGY OVERVIEW  (what we did / why)
 // =====================================================================
 {
-  const s = contentSlide(4, "Our Approach", "What we did & why");
+  const s = contentSlide("Our Approach", "What we did & why");
   s.addText("A ladder of models, from simple to powerful — each answers a question the previous one could not.", {
     x: 1.45, y: 1.65, w: 11.2, h: 0.5, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
   });
@@ -241,7 +243,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 6 — MODEL EXPLAINERS (TF-IDF / LSTM / mBERT)
 // =====================================================================
 {
-  const s = contentSlide(5, "How the Models Work", "Quick primer");
+  const s = contentSlide("How the Models Work", "Quick primer");
   const cols = [
     [NAVY, "TF-IDF + classifier", "Bag of words", [
       "Counts how often each word appears, weighted by rarity.",
@@ -278,7 +280,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 7 — PROPOSED METHOD: ADAPTERS
 // =====================================================================
 {
-  const s = contentSlide(6, "Proposed Method: Adapter Tuning", "The simple idea");
+  const s = contentSlide("Proposed Method: Adapter Tuning", "The simple idea");
   s.addText([
     { text: "Think of mBERT as a huge brain already trained on 104 languages — about ", options: {} },
     { text: "178 million tiny “knobs.”", options: { bold: true, color: NAVY } },
@@ -316,7 +318,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 8 — EXPERIMENTAL DESIGN
 // =====================================================================
 {
-  const s = contentSlide(7, "Experimental Design", "Implementation details");
+  const s = contentSlide("Experimental Design", "Implementation details");
   const blocks = [
     ["Splits", ["80/20 English split for in-language test", "Full multilingual validation for transfer", "Validation order preserved for error analysis"]],
     ["Imbalance", ["Toxic is rare — weight it ~9.5× in the loss", "Tune the decision cut-off, not just 0.5", "so we don't just predict 'clean' for everything"]],
@@ -344,7 +346,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 9 — KEY FINDINGS (table + chart)
 // =====================================================================
 {
-  const s = contentSlide(8, "Key Findings", "Results");
+  const s = contentSlide("Key Findings", "Results");
   // results table
   const rows = [
     [
@@ -410,7 +412,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 9b — KEY FINDINGS (TURKISH VERSION)
 // =====================================================================
 {
-  const s = contentSlide(9, "Temel Bulgular", "Sonuçlar (Türkçe)");
+  const s = contentSlide("Temel Bulgular", "Sonuçlar (Türkçe)");
   // sonuç tablosu
   const rows = [
     [
@@ -476,7 +478,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 10 — PER-LANGUAGE PERFORMANCE
 // =====================================================================
 {
-  const s = contentSlide(10, "Per-Language Transfer", "Where it works");
+  const s = contentSlide("Per-Language Transfer", "Where it works");
   // grouped bar: per language AUC for adapter vs a baseline (LogReg)
   const chartData = [
     { name: "TF-IDF LogReg", labels: ["Turkish", "Spanish", "Italian"], values: [0.652, 0.614, 0.600] },
@@ -506,7 +508,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 11 — EFFICIENCY: ADAPTER vs FULL
 // =====================================================================
 {
-  const s = contentSlide(11, "Models 3 vs 4: Full vs Adapter", "What is different?");
+  const s = contentSlide("Models 3 vs 4: Full vs Adapter", "What is different?");
   s.addText("Both start from the very same pre-trained mBERT. The only difference is how much of it we train.", {
     x: 1.45, y: 1.62, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD,
   });
@@ -548,7 +550,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 12 — ERROR ANALYSIS
 // =====================================================================
 {
-  const s = contentSlide(12, "Error Analysis", "Right & wrong");
+  const s = contentSlide("Error Analysis", "Right & wrong");
   s.addText("Real mBERT-adapter predictions on the multilingual validation set (threshold 0.05).", {
     x: 1.45, y: 1.65, w: 11.2, h: 0.4, fontFace: BFONT, fontSize: 14, italic: true, color: TEALD,
   });
@@ -581,7 +583,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 12b — RELATED WORK / COMPARISON
 // =====================================================================
 {
-  const s = contentSlide(13, "How We Compare to Other Work", "Related work");
+  const s = contentSlide("How We Compare to Other Work", "Related work");
   s.addText("We are not the first to tackle multilingual toxicity. Here is how our laptop-scale result sits next to the literature.", {
     x: 1.45, y: 1.62, w: 11.2, h: 0.45, fontFace: BFONT, fontSize: 15.5, italic: true, color: TEALD,
   });
@@ -616,7 +618,7 @@ function card(s, x, y, w, h, fill) {
 // SLIDE 13 — CONCLUSIONS
 // =====================================================================
 {
-  const s = contentSlide(14, "Concluding Remarks", "What we learned");
+  const s = contentSlide("Concluding Remarks", "What we learned");
   const points = [
     ["Cross-lingual transfer is real", "A multilingual encoder generalises toxicity from English to unseen languages; word-count and LSTM models cannot."],
     ["Adapters are the sweet spot", "~1.34% of parameters reach full-fine-tuning-level transfer (~0.83 AUC) — the project's main result."],
