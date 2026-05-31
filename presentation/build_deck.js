@@ -144,7 +144,7 @@ function card(s, x, y, w, h, fill) {
   s.addText("evaluated unseen: Turkish · Spanish · Italian", { x: cx, y: 4.2, w: cw, h: 0.5, align: "center", fontFace: BFONT, fontSize: 13, color: MUTE });
 
   card(s, cx, 5.0, cw, 1.5, WHITE);
-  s.addText("~15%", { x: cx, y: 5.15, w: cw, h: 0.7, align: "center", fontFace: HFONT, fontSize: 36, bold: true, color: RED });
+  s.addText("~10%", { x: cx, y: 5.15, w: cw, h: 0.7, align: "center", fontFace: HFONT, fontSize: 36, bold: true, color: RED });
   s.addText("toxic — a strongly imbalanced target", { x: cx, y: 5.85, w: cw, h: 0.5, align: "center", fontFace: BFONT, fontSize: 13, color: MUTE });
 }
 
@@ -355,6 +355,7 @@ function card(s, x, y, w, h, fill) {
     ["TF-IDF + Naive Bayes", "0.943", "0.605", "—"],
     ["TF-IDF + SVM", "0.965", "0.582", "—"],
     ["BiLSTM", "0.936", "0.601", "~7M"],
+    ["mBERT (full)", "0.961", "0.848", "100%"],
     ["mBERT + Adapter (ours)", "0.973", "0.826", "1.34%"],
   ];
   data.forEach((d, ri) => {
@@ -371,7 +372,7 @@ function card(s, x, y, w, h, fill) {
       },
     })));
   });
-  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.52, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.44, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
 
   s.addText([
     { text: "Takeaway:  ", options: { bold: true, color: TEALD } },
@@ -383,14 +384,14 @@ function card(s, x, y, w, h, fill) {
   // native bar chart: multilingual AUC
   const chartData = [{
     name: "Multilingual AUC",
-    labels: ["LogReg", "Naive Bayes", "SVM", "BiLSTM", "mBERT+Adapter"],
-    values: [0.627, 0.605, 0.582, 0.601, 0.826],
+    labels: ["LogReg", "Naive Bayes", "SVM", "BiLSTM", "mBERT full", "mBERT+Adapter"],
+    values: [0.627, 0.605, 0.582, 0.601, 0.848, 0.826],
   }];
   s.addChart(pptx.ChartType.bar, chartData, {
     x: 8.4, y: 1.85, w: 4.4, h: 4.7,
     barDir: "col",
-    chartColors: [NAVY, NAVY, NAVY, NAVY, TEAL],
-    chartColorsOpacity: [70, 70, 70, 70, 100],
+    chartColors: [NAVY, NAVY, NAVY, NAVY, TEALD, TEAL],
+    chartColorsOpacity: [70, 70, 70, 70, 100, 100],
     showValue: true, dataLabelColor: INK, dataLabelFontSize: 10, dataLabelFormatCode: "0.00",
     valAxisMinVal: 0.5, valAxisMaxVal: 0.9, valAxisMajorUnit: 0.1,
     catAxisLabelColor: INK, catAxisLabelFontSize: 9,
