@@ -292,6 +292,8 @@ def task_tsne(model_dir, sample_size=600):
         return
     import torch
     from sklearn.manifold import TSNE
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
     from transformers import AutoTokenizer, AutoModel
     import data_utils
 
@@ -314,7 +316,15 @@ def task_tsne(model_dir, sample_size=600):
                             max_length=128, return_tensors="pt").to(device)
             cls = model(**enc).last_hidden_state[:, 0, :]  # [CLS] token
             embeddings.append(cls.cpu().numpy())
-    embeddings = np.concatenate(embeddings)
+    embeddings = np.concatenate(embeddings).astype(np.float64)
+    # mBERT [CLS] vectors have a large dynamic range, which makes the PCA
+    # initialisation of t-SNE overflow. Standardise, drop any non-finite rows,
+    # and reduce to 50 dims with PCA first (the standard, numerically stable
+    # recipe before running t-SNE).
+    embeddings = np.nan_to_num(embeddings, nan=0.0, posinf=0.0, neginf=0.0)
+    embeddings = StandardScaler().fit_transform(embeddings)
+    n_pca = min(50, embeddings.shape[1], embeddings.shape[0] - 1)
+    embeddings = PCA(n_components=n_pca, random_state=42).fit_transform(embeddings)
 
     coords = TSNE(n_components=2, random_state=42,
                   perplexity=30, init="pca").fit_transform(embeddings)
