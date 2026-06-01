@@ -441,6 +441,50 @@ function card(s, x, y, w, h, fill) {
 }
 
 // =====================================================================
+// SLIDE 8b — ZERO-SHOT EVALUATION EXPLAINED
+// =====================================================================
+{
+  const s = contentSlide("Zero-Shot Evaluation: What It Means", "Reading the results");
+  s.addText([
+    { text: "“Zero-shot”", options: { bold: true, color: NAVY } },
+    { text: " = we test the model in languages it saw ", options: {} },
+    { text: "zero", options: { bold: true, color: TEAL } },
+    { text: " labelled examples of during training. We train on English only, then evaluate on Turkish, Spanish and Italian.", options: {} },
+  ], { x: 1.45, y: 1.62, w: 11.2, h: 0.7, fontFace: BFONT, fontSize: 16, italic: true, color: TEALD, lineSpacingMultiple: 1.1 });
+
+  // terminology table
+  const head = ["Setting", "Labelled training data in the target language", "Our project"];
+  const rowsData = [
+    ["Zero-shot", "0 examples — none at all", "✓  This is us  (tr · es · it)"],
+    ["Few-shot", "a handful (≈ 5–50 examples)", "—"],
+    ["Fine-tuned / supervised", "many labelled examples", "—"],
+  ];
+  const table = [head.map((h) => ({ text: h, options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left", fontSize: 14 } }))];
+  rowsData.forEach((d, ri) => {
+    const isStar = ri === 0;
+    const bg = isStar ? "E6F7F4" : (ri % 2 ? WHITE : "EEF3FA");
+    table.push(d.map((c, ci) => ({
+      text: c,
+      options: { align: "left", bold: isStar, color: isStar ? TEALD : INK, fill: { color: bg }, fontSize: 14 },
+    })));
+  });
+  s.addTable(table, { x: 1.45, y: 2.55, w: 11.3, colW: [3.2, 5.3, 2.8], rowH: 0.62, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+
+  // takeaway box
+  card(s, 1.45, 5.2, 11.3, 1.45, "E6F7F4");
+  s.addShape(pptx.ShapeType.rect, { x: 1.45, y: 5.2, w: 0.12, h: 1.45, fill: { color: TEAL } });
+  s.addText([
+    { text: "Why this matters:  ", options: { bold: true, color: TEALD } },
+    { text: "we gave the model ", options: {} },
+    { text: "no", options: { bold: true } },
+    { text: " Turkish / Spanish / Italian data, yet it still ", options: {} },
+    { text: "ranks", options: { italic: true } },
+    { text: " toxicity well (AUC ~0.83). The modest F1 / recall are the price of using zero target-language labels — and exactly the point: moderation that works in new languages ", options: {} },
+    { text: "without collecting data for each one.", options: { bold: true, color: NAVY } },
+  ], { x: 1.75, y: 5.32, w: 10.8, h: 1.2, fontFace: BFONT, fontSize: 14.5, color: INK, valign: "middle", lineSpacingMultiple: 1.12 });
+}
+
+// =====================================================================
 // SLIDE 9 — KEY FINDINGS (table + chart)
 // =====================================================================
 {
@@ -449,18 +493,20 @@ function card(s, x, y, w, h, fill) {
   const rows = [
     [
       { text: "Model", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left" } },
-      { text: "English AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
-      { text: "Multilingual AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Eng. AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Mult. AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Mult. F1", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Mult. recall", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
       { text: "Trainable params", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
     ],
   ];
   const data = [
-    ["TF-IDF + LogReg", "0.969", "0.627", "—"],
-    ["TF-IDF + Naive Bayes", "0.943", "0.605", "—"],
-    ["TF-IDF + SVM", "0.965", "0.582", "—"],
-    ["BiLSTM", "0.936", "0.601", "~7M"],
-    ["mBERT (full)", "0.961", "0.848", "100%"],
-    ["mBERT + Adapter (ours)", "0.973", "0.826", "1.34%"],
+    ["TF-IDF + LogReg", "0.969", "0.627", "0.02", "0.01", "—"],
+    ["TF-IDF + Naive Bayes", "0.943", "0.605", "0.02", "0.01", "—"],
+    ["TF-IDF + SVM", "0.965", "0.582", "0.02", "0.01", "—"],
+    ["BiLSTM", "0.936", "0.601", "0.29", "0.40", "~7M"],
+    ["mBERT (full)", "0.961", "0.848", "0.40", "0.31", "100%"],
+    ["mBERT + Adapter (ours)", "0.973", "0.826", "0.34", "0.25", "1.34%"],
   ];
   data.forEach((d, ri) => {
     const isStar = ri === data.length - 1;
@@ -472,11 +518,11 @@ function card(s, x, y, w, h, fill) {
         bold: isStar,
         color: isStar ? TEALD : INK,
         fill: { color: bg },
-        fontSize: 14,
+        fontSize: 12,
       },
     })));
   });
-  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.44, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.1, 0.9, 0.9, 0.8, 1.0, 1.0], rowH: 0.44, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, fontSize: 12, valign: "middle" });
 
   s.addText([
     { text: "What to read here:  ", options: { bold: true, color: TEALD } },
@@ -515,18 +561,20 @@ function card(s, x, y, w, h, fill) {
   const rows = [
     [
       { text: "Model", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "left" } },
-      { text: "İngilizce AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "İng. AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
       { text: "Çok dilli AUC", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Çok dilli F1", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
+      { text: "Çok dilli recall", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
       { text: "Eğitilen parametre", options: { bold: true, color: WHITE, fill: { color: NAVY }, align: "center" } },
     ],
   ];
   const data = [
-    ["TF-IDF + Lojistik Reg.", "0.969", "0.627", "—"],
-    ["TF-IDF + Naive Bayes", "0.943", "0.605", "—"],
-    ["TF-IDF + SVM", "0.965", "0.582", "—"],
-    ["BiLSTM", "0.936", "0.601", "~7M"],
-    ["mBERT (tam eğitim)", "0.961", "0.848", "%100"],
-    ["mBERT + Adapter (bizim)", "0.973", "0.826", "%1.34"],
+    ["TF-IDF + Lojistik Reg.", "0.969", "0.627", "0.02", "0.01", "—"],
+    ["TF-IDF + Naive Bayes", "0.943", "0.605", "0.02", "0.01", "—"],
+    ["TF-IDF + SVM", "0.965", "0.582", "0.02", "0.01", "—"],
+    ["BiLSTM", "0.936", "0.601", "0.29", "0.40", "~7M"],
+    ["mBERT (tam eğitim)", "0.961", "0.848", "0.40", "0.31", "%100"],
+    ["mBERT + Adapter (bizim)", "0.973", "0.826", "0.34", "0.25", "%1.34"],
   ];
   data.forEach((d, ri) => {
     const isStar = ri === data.length - 1;
@@ -538,11 +586,11 @@ function card(s, x, y, w, h, fill) {
         bold: isStar,
         color: isStar ? TEALD : INK,
         fill: { color: bg },
-        fontSize: 14,
+        fontSize: 12,
       },
     })));
   });
-  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.6, 1.35, 1.6, 1.15], rowH: 0.52, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, valign: "middle" });
+  s.addTable(rows, { x: 1.45, y: 1.85, w: 6.7, colW: [2.1, 0.9, 0.9, 0.8, 1.0, 1.0], rowH: 0.52, border: { type: "solid", color: "D5DEEA", pt: 1 }, fontFace: BFONT, fontSize: 12, valign: "middle" });
 
   s.addText([
     { text: "Buradan ne anlamalı:  ", options: { bold: true, color: TEALD } },
