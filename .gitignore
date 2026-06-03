@@ -227,3 +227,13 @@ models/
 *.key
 SEDS537_Progress_Report_YasinTurk.pdf
 YasinTurk*.pdf
+
+# LaTeX build artifacts
+*.aux
+*.out
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+report/main.pdf
+multilingual_toxic_comment_classification.pdf
