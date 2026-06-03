@@ -107,13 +107,13 @@ subsampling, so results stay comparable.
 - `--no-clean` — feed raw text to mBERT (cleaning ablation).
 - `--mode {full,adapter}` — full fine-tuning vs. parameter-efficient adapters.
 
-## Baseline Results (English Test Split)
+## Results (English Test Split)
 
 | Model | AUC-ROC | F1 | Accuracy |
 |---|---|---|---|
 | TF-IDF + Logistic Regression | 0.9693 | 0.6993 | 0.9527 |
 | TF-IDF + Naive Bayes | 0.9434 | 0.6759 | 0.9445 |
 | TF-IDF + SVM | 0.9649 | 0.7299 | 0.9555 |
-| LSTM (BiLSTM) | - | - | - |
-| mBERT (full fine-tuning) | - | - | - |
-| mBERT + Adapter | - | - | - |
+| BiLSTM | 0.9362 | 0.3587 | 0.6720 |
+| mBERT (full fine-tuning) | 0.9612 | 0.6918 | 0.9259 |
+| **mBERT + Adapter (proposed)** | **0.9732** | 0.6846 | 0.9200 |

@@ -224,3 +224,6 @@ __marimo__/
 data/
 models/
 .DS_Store
+*.key
+SEDS537_Progress_Report_YasinTurk.pdf
+YasinTurk*.pdf
