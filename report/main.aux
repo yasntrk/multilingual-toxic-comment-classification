@@ -1,0 +1,60 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{jigsaw}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Dataset}{1}{section.2}\protected@file@percent }
+\citation{devlin2019}
+\citation{conneau2020}
+\citation{houlsby2019}
+\citation{pfeiffer2020}
+\citation{risch2020}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Text Cleaning}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Exploratory data analysis of the Jigsaw dataset.}}{2}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:eda}{{1}{2}{Exploratory data analysis of the Jigsaw dataset}{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Literature Review}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Methodology}{2}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Baseline Models}{2}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Proposed Method: mBERT with Adapters}{3}{subsection.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Trainable parameters and inference time comparison between mBERT-adapter and mBERT-full.}}{3}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:params}{{2}{3}{Trainable parameters and inference time comparison between mBERT-adapter and mBERT-full}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Training Details}{3}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{4}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}English Test Results}{4}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Results on the English test split (20\% holdout).}}{4}{table.caption.3}\protected@file@percent }
+\newlabel{tab:english}{{1}{4}{Results on the English test split (20\% holdout)}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Multilingual Results}{4}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Results on the multilingual validation set (Turkish, Spanish, Italian).}}{4}{table.caption.4}\protected@file@percent }
+\newlabel{tab:multi}{{2}{4}{Results on the multilingual validation set (Turkish, Spanish, Italian)}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Per-Language Results}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Per-language AUC-ROC comparison across all models.}}{5}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:perlang}{{3}{5}{Per-language AUC-ROC comparison across all models}{figure.caption.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Per-language AUC-ROC for the mBERT models.}}{5}{table.caption.6}\protected@file@percent }
+\newlabel{tab:perlang}{{3}{5}{Per-language AUC-ROC for the mBERT models}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Ablation Study}{5}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Adapter Size}{5}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Full Fine-Tuning vs.\ Adapters}{5}{subsection.6.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Adapter vs.\ full fine-tuning comparison.}}{5}{table.caption.7}\protected@file@percent }
+\newlabel{tab:ablation}{{4}{5}{Adapter vs.\ full fine-tuning comparison}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Text Cleaning Impact}{6}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Error Analysis}{6}{section.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-language confusion matrices for multilingual validation.}}{6}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:confusion}{{4}{6}{Per-language confusion matrices for multilingual validation}{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Visualizations}{7}{section.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces ROC curves comparing all models.}}{7}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:roc}{{5}{7}{ROC curves comparing all models}{figure.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces t-SNE visualization of mBERT [CLS] embeddings on the multilingual validation set. Left: colored by language. Right: colored by toxicity. Languages are mixed together (good cross-lingual alignment) and toxic/non-toxic clusters show some separation.}}{7}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:tsne}{{6}{7}{t-SNE visualization of mBERT [CLS] embeddings on the multilingual validation set. Left: colored by language. Right: colored by toxicity. Languages are mixed together (good cross-lingual alignment) and toxic/non-toxic clusters show some separation}{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Top TF-IDF features for the toxic and non-toxic classes (from the Logistic Regression model). Toxic features include profanity and insults; non-toxic features are neutral Wikipedia-style words.}}{8}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:features}{{7}{8}{Top TF-IDF features for the toxic and non-toxic classes (from the Logistic Regression model). Toxic features include profanity and insults; non-toxic features are neutral Wikipedia-style words}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}GitHub and Reproducibility}{8}{section.9}\protected@file@percent }
+\bibcite{jigsaw}{1}
+\bibcite{devlin2019}{2}
+\bibcite{conneau2020}{3}
+\bibcite{houlsby2019}{4}
+\bibcite{pfeiffer2020}{5}
+\bibcite{risch2020}{6}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Conclusion}{9}{section.10}\protected@file@percent }
+\gdef \@abspage@last{9}

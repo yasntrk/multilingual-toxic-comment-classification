@@ -117,3 +117,11 @@ subsampling, so results stay comparable.
 | BiLSTM | 0.9362 | 0.3587 | 0.6720 |
 | mBERT (full fine-tuning) | 0.9612 | 0.6918 | 0.9259 |
 | **mBERT + Adapter (proposed)** | **0.9732** | 0.6846 | 0.9200 |
+
+## Submission Links
+
+| Item | Link |
+|---|---|
+| **Source Code (GitHub)** | [github.com/yasntrk/multilingual-toxic-comment-classification](https://github.com/yasntrk/multilingual-toxic-comment-classification) |
+| **Report LaTeX (Overleaf)** | [overleaf.com/read/wsgrkdbsjccx](https://www.overleaf.com/read/wsgrkdbsjccx#861c23) |
+| **Dataset** | [Jigsaw Multilingual Toxic Comment Classification (Kaggle)](https://www.kaggle.com/datasets/julian3833/jigsaw-multilingual-toxic-comment-classification) |
